@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-08 20:06
-# Last modified: 2017-08-08 20:41
+# Last modified: 2017-08-09 17:28
 # Filename: fake.py
 # Description:
 from time import sleep
@@ -16,6 +16,12 @@ class FakeNetwork:
     def __call__(self, *arg, **kwargs):
         sleep(self.speed)
         return None
+
+    def state_dict(self):
+        return {}
+
+    def load_state_dict(self, state_dict):
+        pass
 
 
 class FakeDataLoader:
@@ -36,13 +42,26 @@ class FakeOptimizer:
     def step(self, closure):
         return closure()
 
+    def state_dict(self):
+        return {}
+
+    def load_state_dict(self, state_dict):
+        pass
+
 
 class FakeLoss:
+    cnt = 0
     def backward(self):
         pass
 
     def __str__(self):
         return '{:.2f}'.format(random() * 10)
+
+    def __getitem__(self, idx):
+        self.cnt += 1
+        if self.cnt == 5:
+            return 0
+        return random() * 10
 
 
 class FakeHook:
@@ -57,3 +76,8 @@ class FakeHook:
 
 def FakeCreteria(output, target):
     return FakeLoss()
+
+
+class FakeMeter:
+    def __getitem__(self, item):
+        return random() * 10

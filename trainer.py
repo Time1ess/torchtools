@@ -3,15 +3,19 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-08 19:34
-# Last modified: 2017-08-08 20:41
+# Last modified: 2017-08-09 19:06
 # Filename: trainer.py
 # Description:
+import torch
+
+from torch.autograd import Variable
 from tqdm import tqdm, trange
 
 
-class ModuleTrainer:
-    def __init__(self):
+class ModelTrainer:
+    def __init__(self, use_cuda):
         self.hooks = {}
+        self.use_cuda = use_cuda
 
     def register_hook(self, name, hook):
         self.hooks[name] = hook
@@ -23,34 +27,55 @@ class ModuleTrainer:
         if name in self.hooks:
             self.hooks[name](state)
 
-    def train(self, network, data_loader, creteria, optimizer, max_epoch):
+    def restore_state(self, state, checkpoint):
+        print('Restore from checkpoint:'.format(checkpoint))
+        checkpoint = torch.load(checkpoint)
+        state['model'].load_state_dict(checkpoint['model_state_dict'])
+        state['optimizer'].load_state_dict(checkpoint['optimizer_state_dict'])
+        state['epochs'] = checkpoint['epochs']
+        state['iters'] = checkpoint['iters']
+
+    def train(self, model, data_loader, creteria, optimizer, max_epoch,
+            checkpoint=None):
         state = {
-            'network': network,
+            'model': model,
+            'arch': model.__class__.__name__,
             'data_loader': data_loader,
             'max_epoch': max_epoch,
-            'epoch': 0,
+            'epochs': 0,
             'iters': 0,
             'optimizer': optimizer,
             'train': True,
         }
+        if checkpoint is not None:
+            self.restore_state(state, checkpoint)
         self.on_hook('on_train_start', state)
-        iter_epoch = trange(max_epoch, unit=' epochs')
+        iter_epoch = trange(max_epoch, initial=state['epochs'], unit='epoch')
         iter_epoch.set_description('Train')
         for epoch in iter_epoch:
-            state['epoch'] = epoch
+            state['epochs'] = epoch
             self.on_hook('on_epoch_start', state)
 
             iter_data = tqdm(data_loader, unit=' batches')
             iter_data.set_description('Epoch ' + str(epoch))
-            for (input, target) in iter_data:
-                state['input'] = input
-                state['target'] = target
+            for batch in iter_data:
+                if self.use_cuda:
+                    input = Variable(batch[0].cuda())
+                    target = Variable(batch[1].cuda())
+                else:
+                    input = Variable(batch[0])
+                    target = Variable(batch[1])
+
+                state['input'] = batch[0]
+                state['target'] = batch[1]
                 self.on_hook('on_batch_start', state)
 
                 def closure():
-                    output = state['network'](input)
+                    state['optimizer'].zero_grad()
+                    output = state['model'](input)
                     loss = creteria(output, target)
-                    iter_data.set_postfix(loss=loss)
+                    iter_data.set_postfix(iters=state['iters'],
+                                          loss=loss.data[0])
                     state['output'] = output
                     state['loss'] = loss
                     self.on_hook('on_forward_end', state)
@@ -60,7 +85,6 @@ class ModuleTrainer:
                     state['loss'] = None
                     return loss
 
-                state['optimizer'].zero_grad()
                 state['optimizer'].step(closure)
                 self.on_hook('on_batch_end', state)
                 state['iters'] += 1
@@ -68,26 +92,32 @@ class ModuleTrainer:
         self.on_hook('on_train_end', state)
         return state
 
-    def test(self, network, data_loader, creteria):
+    def test(self, model, data_loader, creteria):
         state = {
-            'network': network,
+            'model': model,
+            'arch': model.__class__.__name__,
             'data_loader': data_loader,
-            'optimizer': optimizer,
             'iters': 0,
             'train': False,
         }
         self.on_hook('on_test_start', state)
         iter_data = tqdm(data_loader, unit=' batches')
         iter_data.set_description('Test')
-        for (input, target) in iter_data:
-            state['input'] = input
-            state['target'] = target
+        for batch in iter_data:
+            if self.use_cuda:
+                input = Variable(batch[0].cuda())
+                target = Variable(batch[1].cuda())
+            else:
+                input = Variable(batch[0])
+                target = Variable(batch[1])
+            state['input'] = batch[0]
+            state['target'] = batch[1]
             self.on_hook('on_batch_start', state)
 
             def closure():
-                output = state['network'](input)
+                output = state['model'](input)
                 loss = creteria(output, target)
-                iter_data.set_postfix(loss=loss)
+                iter_data.set_postfix(loss=loss.data[0])
                 state['output'] = output
                 state['loss'] = loss
                 self.on_hook('on_forward_end', state)
@@ -101,13 +131,3 @@ class ModuleTrainer:
             state['iters'] += 1
         self.on_hook('on_test_end', state)
         return state
-
-
-if __name__ == '__main__':
-    from fake import FakeNetwork, FakeDataLoader, FakeCreteria, FakeOptimizer
-    network = FakeNetwork(0.01)
-    data_loader = FakeDataLoader()
-    optimizer = FakeOptimizer()
-    trainer = ModuleTrainer()
-    trainer.train(network, data_loader, FakeCreteria, optimizer, 10)
-    trainer.test(network, data_loader, FakeCreteria)
