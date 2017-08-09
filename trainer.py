@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-08 19:34
-# Last modified: 2017-08-09 19:06
+# Last modified: 2017-08-09 21:57
 # Filename: trainer.py
 # Description:
 import torch

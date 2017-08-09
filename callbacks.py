@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-09 10:57
-# Last modified: 2017-08-09 17:32
+# Last modified: 2017-08-09 21:57
 # Filename: callbacks.py
 # Description:
 import math
@@ -97,8 +97,25 @@ class EarlyStopping(Callback):
     pass
 
 
-class LearningRateScheduler(Callback):
-    pass
+class LRScheduler(Callback):
+    def __call__(self, state):
+        pass
+
+
+class ExpLRScheduler(LRScheduler):
+    def __init__(self, optimizer, max_iters, power):
+        self.init_lr = [d['lr'] for d in optimizer.param_groups]
+        self.max_iters = max_iters
+        self.power = power
+
+    def __call__(self, state):
+        if state['train'] is False:
+            return
+        iters = state['iters']
+        optimizer = state['optimizer']
+        for idx, d in enumerate(optimizer.param_groups):
+            d['lr'] = self.init_lr[idx] * \
+                (1 - 1.0 * iters / self.max_iters) ** self.power
 
 
 class CSVLogger(Callback):
