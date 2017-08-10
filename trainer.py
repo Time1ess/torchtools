@@ -3,29 +3,80 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-08 19:34
-# Last modified: 2017-08-09 21:57
+# Last modified: 2017-08-10 15:52
 # Filename: trainer.py
 # Description:
+from itertools import chain
+
 import torch
 
 from torch.autograd import Variable
 from tqdm import tqdm, trange
 
+from .exceptions import EarlyStoppingError, HookTypeError
+from .callbacks import Hook
+from .meters import Meter
+
 
 class ModelTrainer:
-    def __init__(self, use_cuda):
-        self.hooks = {}
-        self.use_cuda = use_cuda
+    hook_entries = [
+        'on_train_start', 'on_epoch_start', 'on_batch_start',
+        'on_forward_end', 'on_batch_end', 'on_epoch_end',
+        'on_train_end', 'on_test_start', 'on_test_end']
 
-    def register_hook(self, name, hook):
-        self.hooks[name] = hook
+    def __init__(self, model, train_data_loader, criterion,
+                 optimizer, test_data_loader, use_cuda=True):
+        self.model = model
+        self.train_data_loader = train_data_loader
+        self.criterion = criterion
+        self.optimizer = optimizer
+        self.test_data_loader = test_data_loader
+        self.use_cuda = use_cuda and torch.cuda.is_available()
 
-    def unregister_hook(self, name):
-        self.hooks.pop(name, None)
+        self.callback_hooks = {k: [] for k in self.hook_entries}
+        self.meter_hooks = {k: [] for k in self.hook_entries}
+        self.meters = {}
+
+    def register_hooks(self, hooks):
+        for hook in hooks:
+            self.register_hook(hook)
+
+    def register_hook(self, hook):
+        if not isinstance(hook, Hook):
+            raise HookTypeError('{} is not a valid Hook type'.format(hook))
+        elif isinstance(hook, Meter):
+            container = self.meter_hooks
+            self.meters[hook.meter_type] = hook
+        else:
+            container = self.callback_hooks
+
+        for name in self.hook_entries:
+            entry = getattr(hook, name)
+            container[name].append(entry)
+
+    def unregister_hook(self, hook):
+        if not isinstance(hook, Hook):
+            raise HookTypeError('{} is not a valid Hook type'.format(hook))
+        elif isinstance(hook, Meter):
+            container = self.meter_hooks
+            self.meters.pop(hook.meter_type, None)
+        else:
+            container = self.callback_hooks
+
+        for name in self.hook_entries:
+            entry = getattr(hook, name, None)
+            if entry is not None:
+                container[name].remove(entry)
 
     def on_hook(self, name, state):
-        if name in self.hooks:
-            self.hooks[name](state)
+        for hook in self.meter_hooks[name]:
+            hook(state)
+        # TODO: Maybe there is a better way to call test after meter reset?
+        if name == 'on_epoch_end':
+            self.test()
+        for hook in self.callback_hooks[name]:
+            hook(state)
+
 
     def restore_state(self, state, checkpoint):
         print('Restore from checkpoint:'.format(checkpoint))
@@ -35,17 +86,23 @@ class ModelTrainer:
         state['epochs'] = checkpoint['epochs']
         state['iters'] = checkpoint['iters']
 
-    def train(self, model, data_loader, creteria, optimizer, max_epoch,
-            checkpoint=None):
+    def train(self, max_epoch, checkpoint=None):
+        model = self.model.train(True)
+        data_loader = self.train_data_loader
+        criterion = self.criterion
+        optimizer = self.optimizer
+        meters = self.meters
+        use_cuda = self.use_cuda
+
         state = {
             'model': model,
             'arch': model.__class__.__name__,
-            'data_loader': data_loader,
             'max_epoch': max_epoch,
             'epochs': 0,
             'iters': 0,
             'optimizer': optimizer,
             'train': True,
+            'meters': meters,
         }
         if checkpoint is not None:
             self.restore_state(state, checkpoint)
@@ -59,7 +116,7 @@ class ModelTrainer:
             iter_data = tqdm(data_loader, unit=' batches')
             iter_data.set_description('Epoch ' + str(epoch))
             for batch in iter_data:
-                if self.use_cuda:
+                if use_cuda:
                     input = Variable(batch[0].cuda())
                     target = Variable(batch[1].cuda())
                 else:
@@ -73,7 +130,7 @@ class ModelTrainer:
                 def closure():
                     state['optimizer'].zero_grad()
                     output = state['model'](input)
-                    loss = creteria(output, target)
+                    loss = criterion(output, target)
                     iter_data.set_postfix(iters=state['iters'],
                                           loss=loss.data[0])
                     state['output'] = output
@@ -88,42 +145,51 @@ class ModelTrainer:
                 state['optimizer'].step(closure)
                 self.on_hook('on_batch_end', state)
                 state['iters'] += 1
-            self.on_hook('on_epoch_end', state)
+            try:
+                self.on_hook('on_epoch_end', state)
+            except EarlyStoppingError:
+                break
         self.on_hook('on_train_end', state)
         return state
 
-    def test(self, model, data_loader, creteria):
+    def test(self):
+        model = self.model.train(False)
+        data_loader = self.test_data_loader
+        criterion = self.criterion
+        meters = self.meters
+        use_cuda = self.use_cuda
+
         state = {
             'model': model,
             'arch': model.__class__.__name__,
-            'data_loader': data_loader,
-            'iters': 0,
             'train': False,
+            'iters': 0,
+            'meters': meters,
         }
         self.on_hook('on_test_start', state)
         iter_data = tqdm(data_loader, unit=' batches')
         iter_data.set_description('Test')
         for batch in iter_data:
-            if self.use_cuda:
-                input = Variable(batch[0].cuda())
-                target = Variable(batch[1].cuda())
+            if use_cuda:
+                input = Variable(batch[0].cuda(), volatile=True)
+                target = Variable(batch[1].cuda(), volatile=True)
             else:
-                input = Variable(batch[0])
-                target = Variable(batch[1])
+                input = Variable(batch[0], volatile=True)
+                target = Variable(batch[1], volatile=True)
             state['input'] = batch[0]
             state['target'] = batch[1]
             self.on_hook('on_batch_start', state)
 
             def closure():
                 output = state['model'](input)
-                loss = creteria(output, target)
+                loss = criterion(output, target)
                 iter_data.set_postfix(loss=loss.data[0])
                 state['output'] = output
-                state['loss'] = loss
+                state['val_loss'] = loss
                 self.on_hook('on_forward_end', state)
                 # Free memory
                 state['output'] = None
-                state['loss'] = None
+                state['val_loss'] = None
                 return loss
 
             closure()

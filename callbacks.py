@@ -3,17 +3,29 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-09 10:57
-# Last modified: 2017-08-09 21:57
+# Last modified: 2017-08-10 15:52
 # Filename: callbacks.py
 # Description:
 import math
+import csv
 import shutil
 import os
 
 import torch
 
+from .exceptions import EarlyStoppingError
 
-class Callback:
+
+def better_result(monitor, old_value, new_value):
+    if (monitor == 'loss' or monitor == 'val_loss') and new_value < old_value:
+        return True
+    elif (monitor == 'acc' or monitor == 'val_acc') and new_value > old_value:
+        return True
+    else:
+        return False
+
+
+class Hook:
     """
     Abstract class.
     """
@@ -41,6 +53,19 @@ class Callback:
     def on_forward_end(self, state):
         pass
 
+    def on_test_start(self, state):
+        pass
+
+    def on_test_end(self, state):
+        pass
+
+    def __str__(self):
+        return self.__class__.__name__
+
+
+class Callback(Hook):
+    pass
+
 
 class ModelCheckPoint(Callback):
     def __init__(self,
@@ -51,25 +76,21 @@ class ModelCheckPoint(Callback):
                  save_weights_only=True):
         if not os.path.exists(directory):
             os.makedirs(directory)
+        if monitor == 'loss' or monitor == 'val_loss':
+            self.best = math.inf
+        elif monitor == 'acc' or monitor == 'val_acc':
+            self.best = 0
+        else:
+            raise ValueError(
+                'Monitor value {} is not supported'.format(monitor))
         self.directory = directory
         self.monitor = monitor
         self.fname = fname
         self.save_best_only = save_best_only
         self.save_weights_only = save_weights_only
-        if monitor.endswith('loss'):
-            self.best = math.inf
-        else:
-            self.best = 0
 
-    def better_result(self, meter_value):
-        if self.monitor.endswith('loss') and meter_value < self.best:
-            return True
-        elif self.monitor.endswith('acc') and meter_value > self.best:
-            return True
-        else:
-            return False
-
-    def save(self, state, meter_value):
+    def on_epoch_end(self, state):
+        meter_value = state['meters'][self.monitor].value[0]
         checkpoint = {
             'epochs': state['epochs'],
             'iters': state['iters'],
@@ -82,7 +103,7 @@ class ModelCheckPoint(Callback):
                 meter_value)
             torch.save(checkpoint, fname)
 
-        if self.better_result(meter_value):
+        if better_result(self.monitor, self.best, meter_value):
             self.best = meter_value
             best_fname = os.path.join(
                 self.directory,
@@ -94,21 +115,40 @@ class ModelCheckPoint(Callback):
 
 
 class EarlyStopping(Callback):
-    pass
+    def __init__(self, monitor, patience):
+        if monitor == 'loss' or monitor == 'val_loss':
+            self.best = math.inf
+        elif monitor == 'acc' or monitor == 'val_acc':
+            self.best = 0
+        else:
+            raise ValueError(
+                'Monitor value {} is not supported'.format(monitor))
+        self.monitor = monitor
+        self.init_patience = patience
+        self.patience = patience
+
+    def on_epoch_end(self, state):
+        meter_value = state['meters'][self.monitor].value[0]
+        if better_result(self.monitor, self.best, meter_value):
+            self.best = meter_value
+            self.patience = self.init_patience
+        else:
+            self.patience -= 1
+            if self.patience == 0:
+                raise EarlyStoppingError()
 
 
 class LRScheduler(Callback):
-    def __call__(self, state):
-        pass
+    def on_train_start(self, state):
+        self.init_lr = [d['lr'] for d in state['optimizer'].param_groups]
 
 
 class ExpLRScheduler(LRScheduler):
-    def __init__(self, optimizer, max_iters, power):
-        self.init_lr = [d['lr'] for d in optimizer.param_groups]
+    def __init__(self, max_iters, power):
         self.max_iters = max_iters
         self.power = power
 
-    def __call__(self, state):
+    def on_batch_end(self, state):
         if state['train'] is False:
             return
         iters = state['iters']
@@ -119,4 +159,18 @@ class ExpLRScheduler(LRScheduler):
 
 
 class CSVLogger(Callback):
+    def __init__(self,
+                 fname='training_log.csv',
+                 directory='logs',
+                 separator=',',
+                 append=False):
+        super().__init__()
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        self.fpath = os.path.join(directory, fname)
+        self.sep = separator
+        self.append = append
+
+
+class BaseVisdomLogger(Callback):
     pass
