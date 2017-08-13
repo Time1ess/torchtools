@@ -3,9 +3,11 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-08 19:34
-# Last modified: 2017-08-13 12:49
+# Last modified: 2017-08-13 21:19
 # Filename: trainer.py
 # Description:
+import functools
+
 import torch
 
 from torch.autograd import Variable
@@ -16,12 +18,26 @@ from .callbacks import Hook
 from .meters import Meter
 
 
+def trainer_wraps(func):
+    @functools.wraps(func)
+    def _wraps(self, *args, **kwargs):
+        try:
+            return func(self, *args, **kwargs)
+        except KeyboardInterrupt:
+            try:
+                self.exit()
+            except Exception:
+                pass
+            return None
+    return _wraps
+
+
 class ModelTrainer:
     hook_entries = [
         'on_train_start', 'on_epoch_start', 'on_batch_start',
         'on_forward_end', 'on_batch_end', 'on_epoch_end',
-        'on_train_end', 'on_test_start', 'on_test_end']
-    training_end = False
+        'on_train_end', 'on_test_start', 'on_test_end', 'on_terminated']
+    trainer_ended = False
 
     def __init__(self, model, train_data_loader, criterion,
                  optimizer, test_data_loader, use_cuda=True):
@@ -71,6 +87,10 @@ class ModelTrainer:
             if entry is not None:
                 container[name].remove(entry)
 
+    def exit(self):
+        self.trainer_ended = True
+        self.on_hook('on_terminated', None)
+
     def on_hook(self, name, state):
         for hook in self.meter_hooks[name]:
             hook(self, state)
@@ -88,6 +108,7 @@ class ModelTrainer:
         state['epochs'] = checkpoint['epochs']
         state['iters'] = checkpoint['iters']
 
+    @trainer_wraps
     def train(self, max_epoch, checkpoint=None):
         model = self.model.train(True)
         data_loader = self.train_data_loader
@@ -95,15 +116,16 @@ class ModelTrainer:
         optimizer = self.optimizer
         meters = self.meters
         use_cuda = self.use_cuda
+        self.trainer_ended = False
 
         state = {
             'model': model,
-            'arch': model.__class__.__name__,
+            'arch': type(model).__name__,
             'max_epoch': max_epoch,
             'epochs': 0,
             'iters': 0,
             'optimizer': optimizer,
-            'train': True,
+            'mode': 'train', 
             'meters': meters,
         }
         if checkpoint is not None:
@@ -146,12 +168,13 @@ class ModelTrainer:
 
                 state['optimizer'].step(closure)
                 self.on_hook('on_batch_end', state)
-                if self.training_end:
+                if self.trainer_ended:
                     break
                 state['iters'] += 1
             self.on_hook('on_epoch_end', state)
-            if self.training_end:
+            if self.trainer_ended:
                 break
+        self.trainer_ended = True
         self.on_hook('on_train_end', state)
         return state
 
@@ -164,8 +187,8 @@ class ModelTrainer:
 
         state = {
             'model': model,
-            'arch': model.__class__.__name__,
-            'train': False,
+            'arch': type(model).__name__,
+            'mode': 'test',
             'iters': 0,
             'meters': meters,
         }

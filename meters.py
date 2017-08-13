@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-09 11:23
-# Last modified: 2017-08-13 11:47
+# Last modified: 2017-08-13 15:21
 # Filename: meters.py
 # Description:
 import math
@@ -38,9 +38,6 @@ class AverageMeter(Meter):
         self.sum = 0
         self.var = 0
 
-    def on_epoch_start(self, trainer, state):
-        self.reset()
-
     def on_forward_end(self, trainer, state):
         val = state.get(self.name, None)
         if val is not None:
@@ -67,6 +64,16 @@ class AverageMeter(Meter):
     def value(self):
         self.calculate()
         return self.mean
+
+
+class EpochAverageMeter(AverageMeter):
+    def on_epoch_start(self, trainer, state):
+        self.reset()
+
+
+class BatchAverageMeter(AverageMeter):
+    def on_batch_start(self, trainer, state):
+        self.reset()
 
 
 class TimeMeter(Meter):

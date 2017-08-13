@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-09 10:57
-# Last modified: 2017-08-13 12:49
+# Last modified: 2017-08-13 21:19
 # Filename: callbacks.py
 # Description:
 import math
@@ -14,6 +14,8 @@ import os
 from datetime import datetime
 
 import torch
+
+from .plots import ProcessVisdomPlot, ThreadVisdomPlot
 
 
 def better_result(monitor, old_value, new_value):
@@ -48,7 +50,7 @@ class Hook:
     Abstract class.
     """
     def __init__(self):
-        pass
+        super().__init__()
 
     def on_train_start(self, trainer, state):
         pass
@@ -77,11 +79,17 @@ class Hook:
     def on_test_end(self, trainer, state):
         pass
 
+    def on_terminated(self, trainer, state):
+        pass
+
     def has_hook_conflict(self, trainer):
         pass
 
+    def _teardown(self):
+        pass
+
     def __str__(self):
-        return self.__class__.__name__
+        return type(self).__name__
 
 
 class Callback(Hook):
@@ -144,7 +152,7 @@ class EarlyStopping(Callback):
         else:
             self.patience -= 1
             if self.patience == 0:
-                trainer.training_end = True
+                trainer.exit()
 
 
 class LRScheduler(Callback):
@@ -176,7 +184,7 @@ class ExpLRScheduler(LRScheduler):
         self.max_iters = len(trainer.train_data_loader) * state['max_epoch']
 
     def on_batch_end(self, trainer, state):
-        if state['train'] is False:
+        if state['mode'] == 'test':
             return
         iters = state['iters']
         optimizer = state['optimizer']
@@ -238,7 +246,7 @@ class CSVLogger(Callback):
         self.sep = separator
         self.writer = None
         if keys is None:
-            self.keys = ['epochs', 'val_loss']
+            self.keys = ['timestamp', 'epochs', 'val_loss']
         elif not (isinstance(keys, list) or isinstance(keys, str)):
             raise ValueError('keys {} is not supported'.format(repr(keys)))
         elif isinstance(keys, str):
@@ -259,7 +267,6 @@ class CSVLogger(Callback):
 
     def on_epoch_end(self, trainer, state):
         if self.writer is None:
-
             class CustomDialect(csv.excel):
                 delimiter = self.sep
 
@@ -271,7 +278,7 @@ class CSVLogger(Callback):
                 self.writer.writeheader()
 
         def handle_value(key):
-            if key == 'now':
+            if key == 'timestamp':
                 return datetime.now()
             elif key in state['meters']:
                 return state['meters'][key].value
@@ -284,10 +291,40 @@ class CSVLogger(Callback):
         self.writer.writerow(row_dict)
         self.csv_file.flush()
 
-    def on_train_end(self, trainer, state):
+    def _teardown(self):
         self.csv_file.close()
         self.writer = None
 
+    def on_train_end(self, trainer, state):
+        self._teardown()
 
-class BaseVisdomLogger(Callback):
-    pass
+    def on_terminated(self, trainer, state):
+        self._teardown()
+
+
+class PlotLogger(ProcessVisdomPlot, Callback):
+    def __init__(self, mode, monitor, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.mode = mode
+        self.monitor = monitor
+
+    def on_terminated(self, trainer, state):
+        super()._teardown()
+
+
+class EpochPlotLogger(PlotLogger):
+    epoch_cnt = 0
+
+    def on_epoch_end(self, trainer, state):
+        meter_value = state['meters'][self.monitor].value
+        self.log(self.epoch_cnt, meter_value)
+        self.epoch_cnt += 1
+
+
+class BatchPlotLogger(PlotLogger):
+    def on_batch_end(self, trainer, state):
+        if state['mode'] != self.mode:
+            return
+        iters = state['iters']
+        meter_value = state['meters'][self.monitor].value
+        self.log(iters, meter_value)
