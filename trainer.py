@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-08 19:34
-# Last modified: 2017-08-13 21:19
+# Last modified: 2017-08-13 21:52
 # Filename: trainer.py
 # Description:
 import functools
@@ -13,7 +13,7 @@ import torch
 from torch.autograd import Variable
 from tqdm import tqdm, trange
 
-from .exceptions import HookTypeError, HookCheckError
+from .exceptions import HookTypeError, HookCheckError, TrainerTerminated
 from .callbacks import Hook
 from .meters import Meter
 
@@ -23,12 +23,12 @@ def trainer_wraps(func):
     def _wraps(self, *args, **kwargs):
         try:
             return func(self, *args, **kwargs)
-        except KeyboardInterrupt:
-            try:
-                self.exit()
-            except Exception:
-                pass
+        except TrainerTerminated:
             return None
+        except KeyboardInterrupt:
+            self.terminate(raise_exception=False)
+        except Exception:
+            raise
     return _wraps
 
 
@@ -87,9 +87,13 @@ class ModelTrainer:
             if entry is not None:
                 container[name].remove(entry)
 
+    def terminate(self, raise_exception=True):
+        self.on_hook('on_terminated', None)
+        if raise_exception:
+            raise TrainerTerminated()
+
     def exit(self):
         self.trainer_ended = True
-        self.on_hook('on_terminated', None)
 
     def on_hook(self, name, state):
         for hook in self.meter_hooks[name]:

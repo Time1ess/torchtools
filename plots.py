@@ -3,9 +3,11 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-13 13:43
-# Last modified: 2017-08-13 21:09
+# Last modified: 2017-08-13 21:52
 # Filename: plots.py
 # Description:
+import signal
+
 from threading import Thread
 from multiprocessing import Process, Queue
 
@@ -73,30 +75,31 @@ class ProcessVisdomPlot(VisdomPlot):
         self.data_queue = data_queue
 
         def consumer(plotter, data_queue):
-            try:
-                win = data_queue.get()
-                env = data_queue.get()
-                opts = data_queue.get()
-                while True:
-                    item = data_queue.get()
-                    if item is None:
-                        break
-                    x, y = item
-                    plotter.viz.updateTrace(
-                        X=np.array([x]),
-                        Y=np.array([y]),
-                        win=win,
-                        env=env,
-                        opts=opts)
-            except Exception:
-                return
+            # Block SIGINT
+            signal.signal(signal.SIGINT, signal.SIG_IGN)
+
+            win = data_queue.get()
+            env = data_queue.get()
+            opts = data_queue.get()
+            while True:
+                item = data_queue.get()
+                if item is None:
+                    break
+                x, y = item
+                plotter.viz.updateTrace(
+                    X=np.array([x]),
+                    Y=np.array([y]),
+                    win=win,
+                    env=env,
+                    opts=opts)
 
         self.data_handler = self.handler_core(
             target=consumer, args=(self, data_queue))
         self.data_handler.start()
 
     def _teardown(self):
-        self.data_queue.put(None)
+        for i in range(4):
+            self.data_queue.put(None)
         self.data_queue.close()
         self.data_queue.join_thread()
         self.data_handler.join()

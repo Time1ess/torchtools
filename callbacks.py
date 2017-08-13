@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-09 10:57
-# Last modified: 2017-08-13 21:19
+# Last modified: 2017-08-13 21:44
 # Filename: callbacks.py
 # Description:
 import math
@@ -255,6 +255,7 @@ class CSVLogger(Callback):
             self.keys = keys
         self.append = append
         self.append_header = True
+        self.csv_file = None
 
     def on_train_start(self, trainer, state):
         if self.append:
@@ -265,18 +266,18 @@ class CSVLogger(Callback):
         else:
             self.csv_file = open(self.fpath, 'w')
 
+        class CustomDialect(csv.excel):
+            delimiter = self.sep
+
+        self.writer = csv.DictWriter(
+            self.csv_file,
+            fieldnames=self.keys,
+            dialect=CustomDialect)
+        if self.append_header:
+            self.writer.writeheader()
+
+
     def on_epoch_end(self, trainer, state):
-        if self.writer is None:
-            class CustomDialect(csv.excel):
-                delimiter = self.sep
-
-            self.writer = csv.DictWriter(
-                self.csv_file,
-                fieldnames=self.keys,
-                dialect=CustomDialect)
-            if self.append_header:
-                self.writer.writeheader()
-
         def handle_value(key):
             if key == 'timestamp':
                 return datetime.now()
@@ -292,7 +293,8 @@ class CSVLogger(Callback):
         self.csv_file.flush()
 
     def _teardown(self):
-        self.csv_file.close()
+        if self.csv_file:
+            self.csv_file.close()
         self.writer = None
 
     def on_train_end(self, trainer, state):
