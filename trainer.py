@@ -3,17 +3,15 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-08 19:34
-# Last modified: 2017-08-10 15:52
+# Last modified: 2017-08-13 09:45
 # Filename: trainer.py
 # Description:
-from itertools import chain
-
 import torch
 
 from torch.autograd import Variable
 from tqdm import tqdm, trange
 
-from .exceptions import EarlyStoppingError, HookTypeError
+from .exceptions import HookTypeError
 from .callbacks import Hook
 from .meters import Meter
 
@@ -23,6 +21,7 @@ class ModelTrainer:
         'on_train_start', 'on_epoch_start', 'on_batch_start',
         'on_forward_end', 'on_batch_end', 'on_epoch_end',
         'on_train_end', 'on_test_start', 'on_test_end']
+    training_end = False
 
     def __init__(self, model, train_data_loader, criterion,
                  optimizer, test_data_loader, use_cuda=True):
@@ -70,13 +69,12 @@ class ModelTrainer:
 
     def on_hook(self, name, state):
         for hook in self.meter_hooks[name]:
-            hook(state)
+            hook(self, state)
         # TODO: Maybe there is a better way to call test after meter reset?
         if name == 'on_epoch_end':
             self.test()
         for hook in self.callback_hooks[name]:
-            hook(state)
-
+            hook(self, state)
 
     def restore_state(self, state, checkpoint):
         print('Restore from checkpoint:'.format(checkpoint))
@@ -144,10 +142,11 @@ class ModelTrainer:
 
                 state['optimizer'].step(closure)
                 self.on_hook('on_batch_end', state)
+                if self.training_end:
+                    break
                 state['iters'] += 1
-            try:
-                self.on_hook('on_epoch_end', state)
-            except EarlyStoppingError:
+            self.on_hook('on_epoch_end', state)
+            if self.training_end:
                 break
         self.on_hook('on_train_end', state)
         return state

@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-09 10:57
-# Last modified: 2017-08-10 15:52
+# Last modified: 2017-08-13 09:45
 # Filename: callbacks.py
 # Description:
 import math
@@ -12,8 +12,6 @@ import shutil
 import os
 
 import torch
-
-from .exceptions import EarlyStoppingError
 
 
 def better_result(monitor, old_value, new_value):
@@ -32,31 +30,31 @@ class Hook:
     def __init__(self):
         pass
 
-    def on_train_start(self, state):
+    def on_train_start(self, trainer, state):
         pass
 
-    def on_train_end(self, state):
+    def on_train_end(self, trainer, state):
         pass
 
-    def on_epoch_start(self, state):
+    def on_epoch_start(self, trainer, state):
         pass
 
-    def on_epoch_end(self, state):
+    def on_epoch_end(self, trainer, state):
         pass
 
-    def on_batch_start(self, state):
+    def on_batch_start(self, trainer, state):
         pass
 
-    def on_batch_end(self, state):
+    def on_batch_end(self, trainer, state):
         pass
 
-    def on_forward_end(self, state):
+    def on_forward_end(self, trainer, state):
         pass
 
-    def on_test_start(self, state):
+    def on_test_start(self, trainer, state):
         pass
 
-    def on_test_end(self, state):
+    def on_test_end(self, trainer, state):
         pass
 
     def __str__(self):
@@ -89,7 +87,7 @@ class ModelCheckPoint(Callback):
         self.save_best_only = save_best_only
         self.save_weights_only = save_weights_only
 
-    def on_epoch_end(self, state):
+    def on_epoch_end(self, trainer, state):
         meter_value = state['meters'][self.monitor].value[0]
         checkpoint = {
             'epochs': state['epochs'],
@@ -127,7 +125,7 @@ class EarlyStopping(Callback):
         self.init_patience = patience
         self.patience = patience
 
-    def on_epoch_end(self, state):
+    def on_epoch_end(self, trainer, state):
         meter_value = state['meters'][self.monitor].value[0]
         if better_result(self.monitor, self.best, meter_value):
             self.best = meter_value
@@ -135,11 +133,11 @@ class EarlyStopping(Callback):
         else:
             self.patience -= 1
             if self.patience == 0:
-                raise EarlyStoppingError()
+                trainer.training_end = True
 
 
 class LRScheduler(Callback):
-    def on_train_start(self, state):
+    def on_train_start(self, trainer, state):
         self.init_lr = [d['lr'] for d in state['optimizer'].param_groups]
 
 
@@ -148,7 +146,7 @@ class ExpLRScheduler(LRScheduler):
         self.max_iters = max_iters
         self.power = power
 
-    def on_batch_end(self, state):
+    def on_batch_end(self, trainer, state):
         if state['train'] is False:
             return
         iters = state['iters']
