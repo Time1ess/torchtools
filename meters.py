@@ -3,10 +3,12 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-09 11:23
-# Last modified: 2017-08-13 09:45
+# Last modified: 2017-08-13 11:47
 # Filename: meters.py
 # Description:
 import math
+
+from datetime import datetime
 
 import numpy as np
 
@@ -14,6 +16,11 @@ from .callbacks import Hook
 
 
 class Meter(Hook):
+    def __init__(self, name):
+        super().__init__()
+        self.reset()
+        self.name = name
+
     def reset(self):
         pass
 
@@ -26,34 +33,25 @@ class Meter(Hook):
 
 
 class AverageMeter(Meter):
-    def __init__(self, meter_type):
-        super().__init__()
-        self.reset()
-        self.meter_type = meter_type
-
     def reset(self):
         self.n = 0
         self.sum = 0
         self.var = 0
 
-    def on_epoch_end(self, trainer, state):
-        self.reset()
-
     def on_epoch_start(self, trainer, state):
         self.reset()
 
     def on_forward_end(self, trainer, state):
-        val = state.get(self.meter_type, None)
+        val = state.get(self.name, None)
         if val is not None:
-            self.add(state[self.meter_type].data[0])
+            self.add(state[self.name].data[0])
 
     def add(self, value, n=1):
         self.n += n
         self.sum += value
         self.var += value * value
 
-    @property
-    def value(self):
+    def calculate(self):
         n = self.n
         if n == 0:
             mean, std = np.nan, np.nan
@@ -62,4 +60,22 @@ class AverageMeter(Meter):
         else:
             mean = self.sum / n
             std = math.sqrt((self.var - mean * mean * n) / (n - 1.0))
-        return mean, std
+        self.mean = mean
+        self.std = std
+
+    @property
+    def value(self):
+        self.calculate()
+        return self.mean
+
+
+class TimeMeter(Meter):
+    def on_epoch_start(self, trainer, state):
+        self.tick = datetime.now()
+
+    def on_epoch_end(self, trainer, state):
+        self.tock = datetime.now()
+
+    @property
+    def value(self):
+        return (self.tock - self.tick).total_seconds()

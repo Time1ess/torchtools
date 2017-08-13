@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-08 19:34
-# Last modified: 2017-08-13 09:45
+# Last modified: 2017-08-13 12:49
 # Filename: trainer.py
 # Description:
 import torch
@@ -11,7 +11,7 @@ import torch
 from torch.autograd import Variable
 from tqdm import tqdm, trange
 
-from .exceptions import HookTypeError
+from .exceptions import HookTypeError, HookCheckError
 from .callbacks import Hook
 from .meters import Meter
 
@@ -35,6 +35,7 @@ class ModelTrainer:
         self.callback_hooks = {k: [] for k in self.hook_entries}
         self.meter_hooks = {k: [] for k in self.hook_entries}
         self.meters = {}
+        self.callbacks = []
 
     def register_hooks(self, hooks):
         for hook in hooks:
@@ -43,11 +44,14 @@ class ModelTrainer:
     def register_hook(self, hook):
         if not isinstance(hook, Hook):
             raise HookTypeError('{} is not a valid Hook type'.format(hook))
+        elif hook.has_hook_conflict(self):
+            raise HookCheckError(hook.conflict)
         elif isinstance(hook, Meter):
             container = self.meter_hooks
-            self.meters[hook.meter_type] = hook
+            self.meters[hook.name] = hook
         else:
             container = self.callback_hooks
+            self.callbacks.append(hook)
 
         for name in self.hook_entries:
             entry = getattr(hook, name)
@@ -58,7 +62,7 @@ class ModelTrainer:
             raise HookTypeError('{} is not a valid Hook type'.format(hook))
         elif isinstance(hook, Meter):
             container = self.meter_hooks
-            self.meters.pop(hook.meter_type, None)
+            self.meters.pop(hook.name, None)
         else:
             container = self.callback_hooks
 

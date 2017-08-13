@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-10 13:56
-# Last modified: 2017-08-13 09:45
+# Last modified: 2017-08-13 12:37
 # Filename: exceptions.py
 # Description:
 class TorchToolsException(Exception):
@@ -11,4 +11,8 @@ class TorchToolsException(Exception):
 
 
 class HookTypeError(TorchToolsException):
+    pass
+
+
+class HookCheckError(TorchToolsException):
     pass
