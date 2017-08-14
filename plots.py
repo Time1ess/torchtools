@@ -3,13 +3,14 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-13 13:43
-# Last modified: 2017-08-13 21:52
+# Last modified: 2017-08-14 09:35
 # Filename: plots.py
 # Description:
 import signal
+import os
 
-from threading import Thread
-from multiprocessing import Process, Queue
+from multiprocessing import Process
+from multiprocessing import Queue as PQueue
 
 import numpy as np
 import visdom
@@ -65,45 +66,45 @@ class VisdomPlot(BaseVisdom):
         self.plot(x, y)
 
 
+def consumer(pid, plotter, data_queue):
+    # Block SIGINT
+    if pid != os.getpid():
+        signal.signal(signal.SIGINT, signal.SIG_IGN)
+
+    win = data_queue.get()
+    env = data_queue.get()
+    opts = data_queue.get()
+    while True:
+        item = data_queue.get()
+        if item is None:
+            break
+        x, y = item
+        plotter.viz.updateTrace(
+            X=np.array([x]),
+            Y=np.array([y]),
+            win=win,
+            env=env,
+            opts=opts)
+
+
 class ProcessVisdomPlot(VisdomPlot):
     handler_core = Process
+    queue_core = PQueue
     context_send = False
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        data_queue = Queue()
+        data_queue = self.queue_core()
         self.data_queue = data_queue
 
-        def consumer(plotter, data_queue):
-            # Block SIGINT
-            signal.signal(signal.SIGINT, signal.SIG_IGN)
-
-            win = data_queue.get()
-            env = data_queue.get()
-            opts = data_queue.get()
-            while True:
-                item = data_queue.get()
-                if item is None:
-                    break
-                x, y = item
-                plotter.viz.updateTrace(
-                    X=np.array([x]),
-                    Y=np.array([y]),
-                    win=win,
-                    env=env,
-                    opts=opts)
-
         self.data_handler = self.handler_core(
-            target=consumer, args=(self, data_queue))
+            target=consumer, args=(os.getpid(), self, data_queue),
+            daemon=True)
         self.data_handler.start()
 
     def _teardown(self):
-        for i in range(4):
-            self.data_queue.put(None)
-        self.data_queue.close()
-        self.data_queue.join_thread()
+        self.data_handler.terminate()
         self.data_handler.join()
-        super()._teardown()
 
     def plot(self, x, y):
         if self.context_send is False:
@@ -112,7 +113,3 @@ class ProcessVisdomPlot(VisdomPlot):
             self.data_queue.put(self.opts)
             self.context_send = True
         self.data_queue.put((x, y))
-
-
-class ThreadVisdomPlot(ProcessVisdomPlot):
-    handler_core = Thread

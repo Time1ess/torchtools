@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-09 10:57
-# Last modified: 2017-08-13 21:44
+# Last modified: 2017-08-14 09:35
 # Filename: callbacks.py
 # Description:
 import math
@@ -15,7 +15,7 @@ from datetime import datetime
 
 import torch
 
-from .plots import ProcessVisdomPlot, ThreadVisdomPlot
+from .plots import ProcessVisdomPlot
 
 
 def better_result(monitor, old_value, new_value):
@@ -49,8 +49,8 @@ class Hook:
     """
     Abstract class.
     """
-    def __init__(self):
-        super().__init__()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     def on_train_start(self, trainer, state):
         pass
@@ -86,7 +86,7 @@ class Hook:
         pass
 
     def _teardown(self):
-        pass
+        super()._teardown()
 
     def __str__(self):
         return type(self).__name__
@@ -152,6 +152,8 @@ class EarlyStopping(Callback):
         else:
             self.patience -= 1
             if self.patience == 0:
+                print()
+                print('EarlyStopping!')
                 trainer.exit()
 
 
@@ -304,7 +306,7 @@ class CSVLogger(Callback):
         self._teardown()
 
 
-class PlotLogger(ProcessVisdomPlot, Callback):
+class PlotLogger(Callback, ProcessVisdomPlot):
     def __init__(self, mode, monitor, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.mode = mode
@@ -315,12 +317,10 @@ class PlotLogger(ProcessVisdomPlot, Callback):
 
 
 class EpochPlotLogger(PlotLogger):
-    epoch_cnt = 0
 
     def on_epoch_end(self, trainer, state):
         meter_value = state['meters'][self.monitor].value
-        self.log(self.epoch_cnt, meter_value)
-        self.epoch_cnt += 1
+        self.log(state['epochs'], meter_value)
 
 
 class BatchPlotLogger(PlotLogger):

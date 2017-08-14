@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-08 19:34
-# Last modified: 2017-08-13 21:52
+# Last modified: 2017-08-14 09:35
 # Filename: trainer.py
 # Description:
 import functools
