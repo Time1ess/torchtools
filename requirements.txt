@@ -1,0 +1,5 @@
+numpy
+visdom
+PIL
+tqdm
+torch

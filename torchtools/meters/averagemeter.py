@@ -2,34 +2,15 @@
 # coding: UTF-8
 # Author: David
 # Email: youchen.du@gmail.com
-# Created: 2017-08-09 11:23
-# Last modified: 2017-08-14 20:30
-# Filename: meters.py
+# Created: 2017-08-14 21:18
+# Last modified: 2017-08-14 21:19
+# Filename: averagemeter.py
 # Description:
 import math
 
-from datetime import datetime
-
 import numpy as np
 
-from .callbacks import Hook
-
-
-class Meter(Hook):
-    def __init__(self, name):
-        super().__init__()
-        self.reset()
-        self.name = name
-
-    def reset(self):
-        pass
-
-    @property
-    def value(self):
-        pass
-
-    def add(self):
-        pass
+from .meter import Meter
 
 
 class AverageMeter(Meter):
@@ -74,15 +55,3 @@ class EpochAverageMeter(AverageMeter):
 class BatchAverageMeter(AverageMeter):
     def on_batch_start(self, trainer, state):
         self.reset()
-
-
-class TimeMeter(Meter):
-    def on_epoch_start(self, trainer, state):
-        self.tick = datetime.now()
-
-    def on_epoch_end(self, trainer, state):
-        self.tock = datetime.now()
-
-    @property
-    def value(self):
-        return (self.tock - self.tick).total_seconds()
