@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-08 19:34
-# Last modified: 2017-08-14 09:35
+# Last modified: 2017-08-14 20:30
 # Filename: trainer.py
 # Description:
 import functools
@@ -129,7 +129,7 @@ class ModelTrainer:
             'epochs': 0,
             'iters': 0,
             'optimizer': optimizer,
-            'mode': 'train', 
+            'mode': 'train',
             'meters': meters,
         }
         if checkpoint is not None:

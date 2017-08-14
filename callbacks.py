@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-09 10:57
-# Last modified: 2017-08-14 11:32
+# Last modified: 2017-08-14 20:41
 # Filename: callbacks.py
 # Description:
 import math
@@ -15,7 +15,7 @@ from datetime import datetime
 
 import torch
 
-from .plots import ProcessVisdomPlot, ThreadVisdomPlot
+from .plots import ProcessVisdomPlot
 
 
 def better_result(monitor, old_value, new_value):
@@ -278,7 +278,6 @@ class CSVLogger(Callback):
         if self.append_header:
             self.writer.writeheader()
 
-
     def on_epoch_end(self, trainer, state):
         def handle_value(key):
             if key == 'timestamp':
@@ -317,6 +316,7 @@ class PlotLogger(Callback, ProcessVisdomPlot):
 
 
 class EpochPlotLogger(PlotLogger):
+    cache_size = 1
 
     def on_epoch_end(self, trainer, state):
         meter_value = state['meters'][self.monitor].value
@@ -324,6 +324,8 @@ class EpochPlotLogger(PlotLogger):
 
 
 class BatchPlotLogger(PlotLogger):
+    cache_size = 100
+
     def on_batch_end(self, trainer, state):
         if state['mode'] != self.mode:
             return
