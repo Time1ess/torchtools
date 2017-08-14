@@ -3,12 +3,14 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-13 13:43
-# Last modified: 2017-08-14 11:14
+# Last modified: 2017-08-14 11:32
 # Filename: plots.py
 # Description:
 import signal
 import os
 
+from threading import Thread
+from queue import Queue as TQueue
 from multiprocessing import Process
 from multiprocessing import Queue as PQueue
 
@@ -97,6 +99,7 @@ class AsyncVisdomPlot(VisdomPlot):
     handler_core = None
     queue_core = None
     async_init = False
+    context_send = False
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -113,18 +116,24 @@ class AsyncVisdomPlot(VisdomPlot):
             cls.data_handler.start()
             cls.async_init = True
 
-
-class ProcessVisdomPlot(AsyncVisdomPlot):
-    handler_core = Process
-    queue_core = PQueue
-    context_send = False
-
-    def _teardown(self):
-        self.data_handler.terminate()
-        self.data_handler.join()
-
     def plot(self, x, y):
         if self.context_send is False:
             self.data_queue.put((id(self), self.win, self.env, self.opts))
             self.context_send = True
         self.data_queue.put((id(self), x, y))
+
+    def _teardown(self):
+        if hasattr(AsyncVisdomPlot.data_handler, 'terminate'):
+            AsyncVisdomPlot.data_handler.terminate()
+        else:
+            AsyncVisdomPlot.data_queue.put(None)
+        AsyncVisdomPlot.data_handler.join()
+
+class ProcessVisdomPlot(AsyncVisdomPlot):
+    handler_core = Process
+    queue_core = PQueue
+
+
+class ThreadVisdomPlot(AsyncVisdomPlot):
+    handler_core = Thread
+    queue_core = TQueue

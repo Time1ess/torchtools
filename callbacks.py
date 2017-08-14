@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-09 10:57
-# Last modified: 2017-08-14 11:05
+# Last modified: 2017-08-14 11:32
 # Filename: callbacks.py
 # Description:
 import math
@@ -15,7 +15,7 @@ from datetime import datetime
 
 import torch
 
-from .plots import ProcessVisdomPlot
+from .plots import ProcessVisdomPlot, ThreadVisdomPlot
 
 
 def better_result(monitor, old_value, new_value):
