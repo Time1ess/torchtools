@@ -3,10 +3,10 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-14 21:25
-# Last modified: 2017-08-14 21:26
+# Last modified: 2017-08-15 11:21
 # Filename: utils.py
 # Description:
-import math
+import numpy as np
 
 
 def better_result(monitor, old_value, new_value):
@@ -28,7 +28,7 @@ def better_result_thres(monitor, old_value, new_value, epsilon):
 
 def reset_best(monitor):
     if monitor == 'loss' or monitor == 'val_loss':
-        return math.inf
+        return np.inf
     elif monitor == 'acc' or monitor == 'val_acc':
         return 0
     else:

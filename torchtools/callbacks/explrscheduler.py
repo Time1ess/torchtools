@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-14 21:33
-# Last modified: 2017-08-14 21:37
+# Last modified: 2017-08-15 11:10
 # Filename: explrscheduler.py
 # Description:
 from .lrscheduler import LRScheduler
@@ -11,11 +11,11 @@ from .lrscheduler import LRScheduler
 
 class ExpLRScheduler(LRScheduler):
     def __init__(self, power):
-        super().__init__()
+        super(ExpLRScheduler, self).__init__()
         self.power = power
 
     def on_train_start(self, trainer, state):
-        super().on_train_start(trainer, state)
+        super(ExpLRScheduler, self).on_train_start(trainer, state)
         self.max_iters = len(trainer.train_data_loader) * state['max_epoch']
 
     def on_batch_end(self, trainer, state):

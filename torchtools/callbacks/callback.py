@@ -3,17 +3,17 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-14 21:23
-# Last modified: 2017-08-15 14:43
+# Last modified: 2017-08-15 11:46
 # Filename: callback.py
 # Description:
 
 
-class Hook:
+class Hook(object):
     """
     Abstract class.
     """
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super(Hook, self).__init__(*args, **kwargs)
 
     def on_train_start(self, trainer, state):
         pass
@@ -49,11 +49,12 @@ class Hook:
         pass
 
     def _teardown(self):
-        super()._teardown()
+        super(Hook, self)._teardown()
 
     def __str__(self):
         return type(self).__name__
 
 
 class Callback(Hook):
-    pass
+    def __init__(self, *args, **kwargs):
+        super(Callback, self).__init__(*args, **kwargs)

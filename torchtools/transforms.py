@@ -13,7 +13,7 @@ import numbers
 from PIL import ImageOps
 
 
-class PairRandomCrop:
+class PairRandomCrop(object):
     """Crop the given PIL.Image at a random location.
     ** This is a MODIFIED version **, which supports identical random crop for
     both image and target map in Semantic Segmentation.

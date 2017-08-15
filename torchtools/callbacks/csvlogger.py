@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-14 21:35
-# Last modified: 2017-08-14 22:02
+# Last modified: 2017-08-15 11:10
 # Filename: csvlogger.py
 # Description:
 import os
@@ -22,7 +22,7 @@ class CSVLogger(Callback):
                  separator=',',
                  keys=None,
                  append=False):
-        super().__init__()
+        super(CSVLogger, self).__init__()
         if not os.path.exists(directory):
             os.makedirs(directory)
         self.fpath = os.path.join(directory, fname)+'.'+ext

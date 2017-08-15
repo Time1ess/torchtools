@@ -3,9 +3,11 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-14 21:26
-# Last modified: 2017-08-15 12:54
+# Last modified: 2017-08-15 10:36
 # Filename: earlystopping.py
 # Description:
+from __future__ import print_function
+
 from .callback import Callback
 from .utils import reset_best, better_result
 

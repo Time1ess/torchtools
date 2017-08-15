@@ -3,9 +3,10 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-14 21:36
-# Last modified: 2017-08-15 10:18
+# Last modified: 2017-08-15 11:51
 # Filename: plotlogger.py
 # Description:
+from copy import copy
 from collections import defaultdict
 
 from ..plots import VisdomPlot
@@ -16,20 +17,20 @@ class PlotLogger(Callback, VisdomPlot):
     data_cache = None
 
     def __init__(self, mode, monitor, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super(PlotLogger, self).__init__(*args, **kwargs)
         self.mode = mode
         self.monitor = monitor
         self.data_cache = defaultdict(list)
 
     def on_terminated(self, trainer, state):
-        super()._teardown()
+        super(PlotLogger, self)._teardown()
 
     def send_to_cache(self, x, y):
         self.data_cache['x'].append(x)
         self.data_cache['y'].append(y)
         if len(self.data_cache['x']) == self.cache_size:
-            x = self.data_cache['x'].copy()
-            y = self.data_cache['y'].copy()
+            x = copy(self.data_cache['x'])
+            y = copy(self.data_cache['y'])
             self.data_cache.clear()
             self.log(x, y)
 

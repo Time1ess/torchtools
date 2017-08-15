@@ -15,7 +15,7 @@ This API provides these follows:
 * A set of `meters` to get the performance of your model.
 * More `transforms` to PyTorch(such as RandomCrop for Semantic Segmentation).
 
-torchtools supports **Python 3.5+**.
+torchtools supports **Python 2.7+**, **Python 3.5+**.
 
 ## Show
 

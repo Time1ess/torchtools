@@ -3,8 +3,8 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-09 12:15
-# Last modified: 2017-08-15 11:38
-# Filename: tests.py
+# Last modified: 2017-08-15 11:52
+# Filename: full_tests.py
 # Description:
 import shutil
 import os
@@ -38,7 +38,7 @@ def clean_up():
     shutil.rmtree(CHECKPOINTS_DIRECTORY, ignore_errors=True)
     try:
         os.remove(os.path.join(LOG_DIRECTORY, LOG_FILENAME))
-    except FileNotFoundError:
+    except OSError:
         pass
 
 
@@ -63,8 +63,8 @@ classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog',
 
 
 class Net(nn.Module):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, *args, **kwargs):
+        super(Net, self).__init__(*args, **kwargs)
         self.conv1 = nn.Conv2d(3, 32, 3, padding=1)
         self.conv2 = nn.Conv2d(32, 32, 3, padding=1)
         self.conv3 = nn.Conv2d(32, 64, 3, padding=1)

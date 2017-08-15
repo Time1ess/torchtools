@@ -32,7 +32,7 @@ def trainer_wraps(func):
     return _wraps
 
 
-class ModelTrainer:
+class ModelTrainer(object):
     hook_entries = [
         'on_train_start', 'on_epoch_start', 'on_batch_start',
         'on_forward_end', 'on_batch_end', 'on_epoch_end',

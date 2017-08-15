@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-14 21:34
-# Last modified: 2017-08-14 21:35
+# Last modified: 2017-08-15 11:11
 # Filename: reducelronplateau.py
 # Description:
 from .lrscheduler import LRScheduler
@@ -13,8 +13,8 @@ from .utils import reset_best, better_result_thres
 class ReduceLROnPlateau(LRScheduler):
     def __init__(self, monitor='val_loss', factor=0.1, patience=10,
                  epsilon=0.0001, cooldown=0, min_lr=0):
+        super(ReduceLROnPlateau, self).__init__()
         self.best = reset_best(monitor)
-        super().__init__()
         self.monitor = monitor
         self.factor = factor
         self.patience = patience

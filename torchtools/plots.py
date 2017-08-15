@@ -3,19 +3,19 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-13 13:43
-# Last modified: 2017-08-15 10:18
+# Last modified: 2017-08-15 11:51
 # Filename: plots.py
 # Description:
 import numpy as np
 import visdom
 
 
-class BaseVisdom:
+class BaseVisdom(object):
     _viz = visdom.Visdom()
     _server = None
 
-    def __init__(self, win=None, env=None, opts=None):
-        super().__init__()
+    def __init__(self, win=None, env=None, opts=None, *args, **kwargs):
+        super(BaseVisdom, self).__init__(*args, **kwargs)
         self.win = win
         self.env = env
         self.opts = opts
@@ -32,12 +32,16 @@ class BaseVisdom:
 
 
 class VisdomPlot(BaseVisdom):
-    def __init__(self, plot_type, win=None, env=None, opts=None):
-        super().__init__(win, env, opts)
+    def __init__(self, plot_type, win=None, env=None, opts=None,
+                 *args, **kwargs):
+        super(VisdomPlot, self).__init__(win, env, opts, *args, **kwargs)
         self.plot_type = plot_type
         self.chart = getattr(self.viz, plot_type)  # raise AttributeError
 
     def log(self, *args, **kwargs):
+        if len(args) != 2:
+            raise ValueError('Wrong parameters number, Found: {}'.format(
+                len(args)))
         if self.win is None:
             if self.plot_type == 'scatter':
                 chart_args = {'X': np.array(args)}
@@ -49,13 +53,11 @@ class VisdomPlot(BaseVisdom):
                 env=self.env,
                 opts=self.opts,
                 **chart_args)
-        if len(args) != 2:
-            raise ValueError('Wrong parameters number, Found: {}'.format(
-                len(args)))
-        x, y = args
-        self.viz.updateTrace(
-            X=np.array(x),
-            Y=np.array(y),
-            win=self.win,
-            env=self.env,
-            opts=self.opts)
+        else:
+            x, y = args
+            self.viz.updateTrace(
+                X=np.array(x),
+                Y=np.array(y),
+                win=self.win,
+                env=self.env,
+                opts=self.opts)
