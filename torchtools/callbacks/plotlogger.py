@@ -3,21 +3,35 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-14 21:36
-# Last modified: 2017-08-15 11:40
+# Last modified: 2017-08-15 10:18
 # Filename: plotlogger.py
 # Description:
-from ..plots import ProcessVisdomPlot
+from collections import defaultdict
+
+from ..plots import VisdomPlot
 from .callback import Callback
 
 
-class PlotLogger(Callback, ProcessVisdomPlot):
+class PlotLogger(Callback, VisdomPlot):
+    data_cache = None
+
     def __init__(self, mode, monitor, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.mode = mode
         self.monitor = monitor
+        self.data_cache = defaultdict(list)
 
     def on_terminated(self, trainer, state):
         super()._teardown()
+
+    def send_to_cache(self, x, y):
+        self.data_cache['x'].append(x)
+        self.data_cache['y'].append(y)
+        if len(self.data_cache['x']) == self.cache_size:
+            x = self.data_cache['x'].copy()
+            y = self.data_cache['y'].copy()
+            self.data_cache.clear()
+            self.log(x, y)
 
 
 class EpochPlotLogger(PlotLogger):
@@ -25,15 +39,15 @@ class EpochPlotLogger(PlotLogger):
 
     def on_epoch_end(self, trainer, state):
         meter_value = state['meters'][self.monitor].value
-        self.log(state['epochs'], meter_value)
+        self.send_to_cache(state['epochs'], meter_value)
 
 
 class BatchPlotLogger(PlotLogger):
     cache_size = 100
 
     def on_batch_end(self, trainer, state):
-        if state['mode'] != self.mode:
+        if state['mode'] != self.mode:  # Only Train or Test allowed.
             return
         iters = state['iters']
         meter_value = state['meters'][self.monitor].value
-        self.log(iters, meter_value)
+        self.send_to_cache(iters, meter_value)

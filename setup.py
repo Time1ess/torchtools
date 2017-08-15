@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-14 21:43
-# Last modified: 2017-08-14 21:53
+# Last modified: 2017-08-15 10:10
 # Filename: setup.py
 # Description:
 from setuptools import setup, find_packages
@@ -25,6 +25,9 @@ setup_info = dict(
     packages=find_packages(exclude=('test',)),
     zip_safe=True,
     install_requires=[
+        'numpy',
+        'Pillow',
+        'tqdm',
         'torch',
         'visdom'])
 

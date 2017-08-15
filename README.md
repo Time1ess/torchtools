@@ -194,7 +194,7 @@ trainer.train(EPOCHS)
 
 ## Contribute
 
-If there are any bugs or feature requests please [submit an issue](https://github.com/Time1ess/torchtools/issues/new), I'll do as I can.
+If there are any bugs or feature requests please [submit an issue](https://github.com/Time1ess/torchtools/issues/new), I'll see I can do.
 
 Any new features or bug fixes please submit a PR in [Pull requests](https://github.com/Time1ess/torchtools/pulls).
 
