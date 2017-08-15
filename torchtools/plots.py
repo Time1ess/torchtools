@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-13 13:43
-# Last modified: 2017-08-15 18:14
+# Last modified: 2017-08-15 19:37
 # Filename: plots.py
 # Description:
 import time
@@ -43,6 +43,7 @@ def init_server():
     server_proc.start()
     finished.wait()
     time.sleep(0.1)  # Try to wait some time
+
 
 class BaseVisdom(object):
     _viz = visdom.Visdom()

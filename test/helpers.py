@@ -3,10 +3,10 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-15 13:38
-# Last modified: 2017-08-15 17:58
+# Last modified: 2017-08-15 19:38
 # Filename: helpers.py
 # Description:
-from random import random, randint
+from random import randint
 
 
 class FakeModel(object):

@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-15 12:28
-# Last modified: 2017-08-15 18:33
+# Last modified: 2017-08-15 19:38
 # Filename: test_callbacks.py
 # Description:
 import os
@@ -20,7 +20,7 @@ from torchtools.callbacks import ModelCheckPoint
 from torchtools.callbacks import EpochPlotLogger, BatchPlotLogger
 
 from helpers import FakeModel, FakeDatasetLoader
-from helpers import FakeCriterion, FakeOptimizer, FakeTrainer
+from helpers import FakeOptimizer, FakeTrainer
 from helpers import ValueObject
 
 
@@ -169,9 +169,9 @@ class TestModelCheckPoint(unittest.TestCase):
 
         loaded_state = torch.load(path)
         self.assertListEqual(state['model'].state_dict(),
-                         loaded_state['model_state_dict'])
+                             loaded_state['model_state_dict'])
         self.assertListEqual(state['optimizer'].state_dict(),
-                         loaded_state['optimizer_state_dict'])
+                             loaded_state['optimizer_state_dict'])
         self.assertEqual(state['epochs'], loaded_state['epochs'])
         self.assertEqual(state['iters'], loaded_state['iters'])
 
