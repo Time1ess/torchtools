@@ -5,3 +5,4 @@ torchtools.egg-info/
 */**/__pycache__
 */**/*.pyc
 .*
+!.travis.yml

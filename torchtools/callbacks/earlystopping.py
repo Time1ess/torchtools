@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-14 21:26
-# Last modified: 2017-08-14 22:05
+# Last modified: 2017-08-15 12:54
 # Filename: earlystopping.py
 # Description:
 from .callback import Callback
@@ -27,4 +27,4 @@ class EarlyStopping(Callback):
             if self.patience == 0:
                 print('\n')
                 print('EarlyStopping!')
-                trainer.exit()
+                return trainer.exit()

@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-08 19:34
-# Last modified: 2017-08-14 20:30
+# Last modified: 2017-08-15 12:34
 # Filename: trainer.py
 # Description:
 import functools
@@ -94,6 +94,7 @@ class ModelTrainer:
 
     def exit(self):
         self.trainer_ended = True
+        return 0
 
     def on_hook(self, name, state):
         for hook in self.meter_hooks[name]:
