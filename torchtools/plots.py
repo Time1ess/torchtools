@@ -3,11 +3,40 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-13 13:43
-# Last modified: 2017-08-15 11:51
+# Last modified: 2017-08-15 14:17
 # Filename: plots.py
 # Description:
 import numpy as np
 import visdom
+
+from multiprocessing import Process
+
+
+server_proc = None
+
+
+def init_server():
+    global server_proc
+    if server_proc is not None:
+        return
+
+    def __run_server():
+        import sys
+        import signal
+
+        from visdom import server
+
+        signal.signal(signal.SIGINT, signal.SIG_IGN)
+        sys.stdout = None
+        sys.stderr = None
+
+        try:
+            server.main()
+        except OSError:  # Already has one server running
+            pass
+
+    server_proc = Process(target=__run_server, daemon=True)
+    server_proc.start()
 
 
 class BaseVisdom(object):
@@ -61,3 +90,6 @@ class VisdomPlot(BaseVisdom):
                 win=self.win,
                 env=self.env,
                 opts=self.opts)
+
+
+init_server()
