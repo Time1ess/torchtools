@@ -1,5 +1,6 @@
 # torchtools: A High-Level training API on top of PyTorch
 
+[![Build Status](https://travis-ci.org/Time1ess/torchtools.svg?branch=master)](https://travis-ci.org/Time1ess/torchtools)
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://github.com/Time1ess/torchtools/blob/master/LICENSE)
 
 ## Easy Traing, Easy DL.

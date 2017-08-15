@@ -1,3 +1,6 @@
-#!bash
-python3 test_callbacks.py
-python3 test_meters.py
+#!/usr/bin/env bash
+set -e
+PYTHON = ${PYTHON:="python"}
+
+$PYTHON test_callbacks.py
+$PYTHON test_meters.py
