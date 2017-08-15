@@ -3,16 +3,17 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-14 21:27
-# Last modified: 2017-08-14 21:33
-# Filename: lrschedule.py
+# Last modified: 2017-08-15 18:27
+# Filename: lrscheduler.py
 # Description:
 from .callback import Callback
 
 
 class LRScheduler(Callback):
-    @classmethod
-    def set_lr(cls, init_lr):
-        cls.init_lr = init_lr
+    init_lr = None
+
+    def set_lr(self, init_lr):
+        self.init_lr = init_lr
 
     def on_train_start(self, trainer, state):
         init_lr = [d['lr'] for d in state['optimizer'].param_groups]

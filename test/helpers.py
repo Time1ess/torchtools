@@ -3,13 +3,17 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-15 13:38
-# Last modified: 2017-08-15 14:40
+# Last modified: 2017-08-15 17:58
 # Filename: helpers.py
 # Description:
+from random import random, randint
 
 
-class FakeModel:
+class FakeModel(object):
     _train = True
+
+    def __init__(self, *args, **kwargs):
+        self._state_dict = [randint(0, 100) for _ in range(10)]
 
     def train(self, train=True):
         self._train = train
@@ -17,26 +21,34 @@ class FakeModel:
     def __call__(self, input):
         return input
 
+    def state_dict(self):
+        return self._state_dict
 
-class FakeDatasetLoader:
+
+class FakeDatasetLoader(object):
     def __len__(self):
         return 10
 
 
-class FakeCriterion:
+class FakeCriterion(object):
     pass
 
 
-class FakeOptimizer:
-    param_groups = [{'lr': 1}, {'lr': 2}]
+class FakeOptimizer(object):
+    def __init__(self):
+        self.param_groups = [{'lr': 1}, {'lr': 2}]
+        self._state_dict = [randint(0, 100) for _ in range(10)]
+
+    def state_dict(self):
+        return self._state_dict
 
 
-class FakeTrainer:
+class FakeTrainer(object):
     def exit(self):
         return 0
 
 
-class ValueObject:
+class ValueObject(object):
     def __init__(self, value):
         self.value = value
         self.data = [value]

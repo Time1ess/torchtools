@@ -3,13 +3,15 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-13 13:43
-# Last modified: 2017-08-15 14:17
+# Last modified: 2017-08-15 18:14
 # Filename: plots.py
 # Description:
+import time
+
 import numpy as np
 import visdom
 
-from multiprocessing import Process
+from multiprocessing import Process, Event
 
 
 server_proc = None
@@ -20,7 +22,7 @@ def init_server():
     if server_proc is not None:
         return
 
-    def __run_server():
+    def __run_server(finished):
         import sys
         import signal
 
@@ -31,13 +33,16 @@ def init_server():
         sys.stderr = None
 
         try:
+            finished.set()
             server.main()
         except OSError:  # Already has one server running
             pass
 
-    server_proc = Process(target=__run_server, daemon=True)
+    finished = Event()
+    server_proc = Process(target=__run_server, args=(finished,), daemon=True)
     server_proc.start()
-
+    finished.wait()
+    time.sleep(0.1)  # Try to wait some time
 
 class BaseVisdom(object):
     _viz = visdom.Visdom()
