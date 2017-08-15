@@ -1,5 +1,5 @@
 numpy
 visdom
-PIL
+Pillow
 tqdm
 torch
