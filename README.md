@@ -14,8 +14,11 @@ This API provides these follows:
 * A bunch of `callbacks` to inject your code in any stages during the training.
 * A set of `meters` to get the performance of your model.
 * More `transforms` to PyTorch(such as RandomCrop for Semantic Segmentation).
+* (**New**) TensorBoard support added.
 
 torchtools supports **Python 2.7+**, **Python 3.5+**.
+
+***Important***: This README may be overdated, please refer to source codes to get more intuition.
 
 ## Show
 
