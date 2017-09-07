@@ -3,14 +3,18 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-08 19:25
-# Last modified: 2017-08-08 19:33
+# Last modified: 2017-09-07 15:45
 # Filename: transforms.py
 # Description:
 import random
 import os
 import numbers
 
-from PIL import ImageOps
+from typing import Iterable
+
+import numpy as np
+
+from PIL import ImageOps, Image
 
 
 class PairRandomCrop(object):
@@ -58,3 +62,55 @@ class PairRandomCrop(object):
             y1 = random.randint(0, h - th)
             self.image_crop_position[pid] = (x1, y1)
         return img.crop((x1, y1, x1 + tw, y1 + th))
+
+
+class PairRandomHorizontalFlip(object):
+    """Randomly horizontally flips the given PIL.Image with a probability
+    of 0.5, for both input and target image
+    """
+
+    def __init__(self):
+        self.flip_set = False
+        self.input_flip = False
+
+    def __call__(self, img):
+        if self.flip_set:
+            self.flip_set = False
+            if self.input_flip:
+                return img.transpose(Image.FLIP_LEFT_RIGHT)
+            else:
+                return img
+        else:
+            self.flip_set = True
+            if random.random() < 0.5:
+                self.input_flip = True
+                return img.transpose(Image.FLIP_LEFT_RIGHT)
+            else:
+                self.input_flip = False
+                return img
+
+
+class ReLabel(object):
+    """ReLabel image from src to dst"""
+
+    def __init__(self, src, dst):
+        if not isinstance(src, Iterable):
+            src = [src]
+        if not isinstance(dst, Iterable):
+            dst = [dst]
+            if len(dst) == 1:
+                dst = dst * len(src)
+        assert len(dst) == len(src)
+        self.src = src
+        self.dst = dst
+
+    def __call__(self, img):
+        for s, d in zip(self.src, self.dst):
+            img[img == s] = d
+        return img
+
+
+class ToArray(object):
+    """Convert PIL Image to Numpy array"""
+    def __call__(self, img):
+        return np.array(img, dtype=np.uint8)

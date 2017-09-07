@@ -3,51 +3,15 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-13 13:43
-# Last modified: 2017-08-15 19:37
+# Last modified: 2017-09-07 16:27
 # Filename: plots.py
 # Description:
-import time
-
 import numpy as np
 import visdom
-
-from multiprocessing import Process, Event
-
-
-server_proc = None
-
-
-def init_server():
-    global server_proc
-    if server_proc is not None:
-        return
-
-    def __run_server(finished):
-        import sys
-        import signal
-
-        from visdom import server
-
-        signal.signal(signal.SIGINT, signal.SIG_IGN)
-        sys.stdout = None
-        sys.stderr = None
-
-        try:
-            finished.set()
-            server.main()
-        except OSError:  # Already has one server running
-            pass
-
-    finished = Event()
-    server_proc = Process(target=__run_server, args=(finished,), daemon=True)
-    server_proc.start()
-    finished.wait()
-    time.sleep(0.1)  # Try to wait some time
 
 
 class BaseVisdom(object):
     _viz = visdom.Visdom()
-    _server = None
 
     def __init__(self, win=None, env=None, opts=None, *args, **kwargs):
         super(BaseVisdom, self).__init__(*args, **kwargs)
@@ -96,6 +60,3 @@ class VisdomPlot(BaseVisdom):
                 win=self.win,
                 env=self.env,
                 opts=self.opts)
-
-
-init_server()

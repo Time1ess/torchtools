@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-14 21:23
-# Last modified: 2017-08-15 11:46
+# Last modified: 2017-09-07 16:29
 # Filename: callback.py
 # Description:
 
@@ -36,10 +36,10 @@ class Hook(object):
     def on_forward_end(self, trainer, state):
         pass
 
-    def on_test_start(self, trainer, state):
+    def on_validate_start(self, trainer, state):
         pass
 
-    def on_test_end(self, trainer, state):
+    def on_validate_end(self, trainer, state):
         pass
 
     def on_terminated(self, trainer, state):

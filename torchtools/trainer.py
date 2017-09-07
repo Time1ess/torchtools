@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-08 19:34
-# Last modified: 2017-08-15 12:34
+# Last modified: 2017-09-07 16:29
 # Filename: trainer.py
 # Description:
 import functools
@@ -36,16 +36,16 @@ class ModelTrainer(object):
     hook_entries = [
         'on_train_start', 'on_epoch_start', 'on_batch_start',
         'on_forward_end', 'on_batch_end', 'on_epoch_end',
-        'on_train_end', 'on_test_start', 'on_test_end', 'on_terminated']
+        'on_train_end', 'on_validate_start', 'on_validate_end', 'on_terminated']
     trainer_ended = False
 
     def __init__(self, model, train_data_loader, criterion,
-                 optimizer, test_data_loader, use_cuda=True):
+                 optimizer, val_data_loader=None, use_cuda=True):
         self.model = model
         self.train_data_loader = train_data_loader
         self.criterion = criterion
         self.optimizer = optimizer
-        self.test_data_loader = test_data_loader
+        self.val_data_loader = val_data_loader
         self.use_cuda = use_cuda and torch.cuda.is_available()
 
         self.callback_hooks = {k: [] for k in self.hook_entries}
@@ -99,9 +99,9 @@ class ModelTrainer(object):
     def on_hook(self, name, state):
         for hook in self.meter_hooks[name]:
             hook(self, state)
-        # TODO: Maybe there is a better way to call test after meter reset?
+        # TODO: Maybe there is a better way to call validate after meter reset?
         if name == 'on_epoch_end':
-            self.test()
+            self.validate()
         for hook in self.callback_hooks[name]:
             hook(self, state)
 
@@ -183,9 +183,11 @@ class ModelTrainer(object):
         self.on_hook('on_train_end', state)
         return state
 
-    def test(self):
+    def validate(self):
+        if self.val_data_loader is None:
+            return {}
         model = self.model.train(False)
-        data_loader = self.test_data_loader
+        data_loader = self.val_data_loader
         criterion = self.criterion
         meters = self.meters
         use_cuda = self.use_cuda
@@ -193,11 +195,11 @@ class ModelTrainer(object):
         state = {
             'model': model,
             'arch': type(model).__name__,
-            'mode': 'test',
+            'mode': 'validate',
             'iters': 0,
             'meters': meters,
         }
-        self.on_hook('on_test_start', state)
+        self.on_hook('on_validate_start', state)
         iter_data = tqdm(data_loader, unit=' batches')
         iter_data.set_description('Test')
         for batch in iter_data:
@@ -226,5 +228,5 @@ class ModelTrainer(object):
             closure()
             self.on_hook('on_batch_end', state)
             state['iters'] += 1
-        self.on_hook('on_test_end', state)
+        self.on_hook('on_validate_end', state)
         return state

@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-14 21:26
-# Last modified: 2017-08-15 10:36
+# Last modified: 2017-09-07 16:30
 # Filename: earlystopping.py
 # Description:
 from __future__ import print_function
@@ -27,6 +27,6 @@ class EarlyStopping(Callback):
         else:
             self.patience -= 1
             if self.patience == 0:
-                print('\n')
+                print('\n\n')
                 print('EarlyStopping!')
                 return trainer.exit()

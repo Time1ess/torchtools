@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-14 21:36
-# Last modified: 2017-08-15 11:51
+# Last modified: 2017-08-17 13:28
 # Filename: plotlogger.py
 # Description:
 from copy import copy
@@ -16,11 +16,13 @@ from .callback import Callback
 class PlotLogger(Callback, VisdomPlot):
     data_cache = None
 
-    def __init__(self, mode, monitor, *args, **kwargs):
+    def __init__(self, mode, monitor, size=None, *args, **kwargs):
         super(PlotLogger, self).__init__(*args, **kwargs)
         self.mode = mode
         self.monitor = monitor
         self.data_cache = defaultdict(list)
+        if size:
+            self.cache_size = size
 
     def on_terminated(self, trainer, state):
         super(PlotLogger, self)._teardown()

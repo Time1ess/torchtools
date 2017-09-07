@@ -3,41 +3,35 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-14 21:18
-# Last modified: 2017-08-14 21:19
+# Last modified: 2017-09-07 16:40
 # Filename: averagemeter.py
 # Description:
-import math
-
 import numpy as np
 
 from .meter import Meter
 
 
 class AverageMeter(Meter):
+    def __init__(self, *args, **kwargs):
+        super(AverageMeter, self).__init__(*args, **kwargs)
+        self.values = []
+
     def reset(self):
-        self.n = 0
-        self.sum = 0
-        self.var = 0
+        self.values.clear()
 
     def on_forward_end(self, trainer, state):
         val = state.get(self.name, None)
         if val is not None:
             self.add(state[self.name].data[0])
 
-    def add(self, value, n=1):
-        self.n += n
-        self.sum += value
-        self.var += value * value
+    def add(self, value):
+        self.values.append(value)
 
     def calculate(self):
-        n = self.n
-        if n == 0:
+        if not self.values:
             mean, std = np.nan, np.nan
-        elif n == 1:
-            mean, std = self.sum, np.inf
         else:
-            mean = self.sum / n
-            std = math.sqrt((self.var - mean * mean * n) / (n - 1.0))
+            mean, std = np.nanmean(self.values), np.nanstd(self.values)
         self.mean = mean
         self.std = std
 
