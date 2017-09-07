@@ -1,11 +1,13 @@
-#!/usr/local/bin/python3
+#!/usr/bin/python3
 # coding: UTF-8
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-13 13:43
-# Last modified: 2017-09-07 16:27
-# Filename: plots.py
+# Last modified: 2017-09-07 20:23
+# Filename: visdom_plot.py
 # Description:
+import sys
+
 import numpy as np
 import visdom
 

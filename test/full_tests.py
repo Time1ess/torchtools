@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-09 12:15
-# Last modified: 2017-08-15 11:52
+# Last modified: 2017-09-07 17:26
 # Filename: full_tests.py
 # Description:
 import shutil
@@ -52,11 +52,11 @@ trainset = torchvision.datasets.CIFAR10(
 train_loader = torch.utils.data.DataLoader(
     trainset, batch_size=BATCH_SIZE, shuffle=True, num_workers=NUM_WORKERS)
 
-testset = torchvision.datasets.CIFAR10(
+valset = torchvision.datasets.CIFAR10(
     root=DATASET_DIRECTORY, train=False, transform=transform)
 
-test_loader = torch.utils.data.DataLoader(
-    testset, batch_size=BATCH_SIZE, shuffle=False, num_workers=NUM_WORKERS)
+val_loader = torch.utils.data.DataLoader(
+    valset, batch_size=BATCH_SIZE, shuffle=False, num_workers=NUM_WORKERS)
 
 classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog',
            'horse', 'ship', 'truck')
@@ -131,23 +131,23 @@ csv_logger = CSVLogger(directory=LOG_DIRECTORY, fname=LOG_FILENAME,
                        append=False)
 lr_reduce = ReduceLROnPlateau(patience=0)
 train_plot_logger = BatchPlotLogger(
-    'train', 'loss', 'line',
+    'train', 'loss', 10, 'line',
     opts={'title': 'Training Loss', 'xlabel': 'iterations', 'ylabel': 'Loss'})
-test_plot_logger = EpochPlotLogger(
-    'test', 'val_loss', 'line',
+val_plot_logger = EpochPlotLogger(
+    'val', 'val_loss', 1, 'line',
     opts={'title': 'Test Loss', 'xlabel': 'epochs', 'ylabel': 'Loss'})
 time_plot_logger = EpochPlotLogger(
-    'train', 'seconds_per_epoch', 'line',
+    'train', 'seconds_per_epoch', 1, 'line',
     opts={'title': 'Epoch training Time',
           'xlabel': 'Epochs', 'ylabel': 'Seconds'})
 
 trainer = ModelTrainer(model, train_loader, criterion, optimizer,
-                       test_loader, use_cuda=True)
+                       val_loader, use_cuda=True)
 
 trainer.register_hooks([
     loss_meter, val_loss_meter, time_meter,
     lr_scheduler, checkpoint, early_stopping, csv_logger,
-    train_plot_logger, test_plot_logger, time_plot_logger])
+    train_plot_logger, val_plot_logger, time_plot_logger])
 
 
 trainer.train(EPOCHS)

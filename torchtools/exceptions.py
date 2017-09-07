@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-10 13:56
-# Last modified: 2017-08-14 20:30
+# Last modified: 2017-09-07 20:27
 # Filename: exceptions.py
 # Description:
 
@@ -21,4 +21,12 @@ class HookCheckError(TorchToolsException):
 
 
 class TrainerTerminated(TorchToolsException):
+    pass
+
+
+class MeterNotFoundError(TorchToolsException):
+    pass
+
+
+class LogTypeError(TorchToolsException):
     pass

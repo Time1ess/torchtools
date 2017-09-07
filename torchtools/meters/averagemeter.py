@@ -3,18 +3,18 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-14 21:18
-# Last modified: 2017-09-07 16:40
+# Last modified: 2017-09-07 21:49
 # Filename: averagemeter.py
 # Description:
 import numpy as np
 
-from .meter import Meter
+from .meter import Meter, EpochResetMeter, BatchResetMeter
 
 
 class AverageMeter(Meter):
     def __init__(self, *args, **kwargs):
-        super(AverageMeter, self).__init__(*args, **kwargs)
         self.values = []
+        super(AverageMeter, self).__init__(*args, **kwargs)
 
     def reset(self):
         self.values.clear()
@@ -41,11 +41,9 @@ class AverageMeter(Meter):
         return self.mean
 
 
-class EpochAverageMeter(AverageMeter):
-    def on_epoch_start(self, trainer, state):
-        self.reset()
+class EpochAverageMeter(EpochResetMeter, AverageMeter):
+    pass
 
 
-class BatchAverageMeter(AverageMeter):
-    def on_batch_start(self, trainer, state):
-        self.reset()
+class BatchAverageMeter(BatchResetMeter, AverageMeter):
+    pass

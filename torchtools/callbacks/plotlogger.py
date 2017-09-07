@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-14 21:36
-# Last modified: 2017-08-17 13:28
+# Last modified: 2017-09-07 20:09
 # Filename: plotlogger.py
 # Description:
 from copy import copy
@@ -11,18 +11,24 @@ from collections import defaultdict
 
 from ..plots import VisdomPlot
 from .callback import Callback
+from ..exceptions import MeterNotFoundError
 
 
 class PlotLogger(Callback, VisdomPlot):
     data_cache = None
 
-    def __init__(self, mode, monitor, size=None, *args, **kwargs):
+    def __init__(self, mode, monitor, cache_size=None, *args, **kwargs):
         super(PlotLogger, self).__init__(*args, **kwargs)
         self.mode = mode
         self.monitor = monitor
         self.data_cache = defaultdict(list)
-        if size:
-            self.cache_size = size
+        if cache_size:
+            self.cache_size = cache_size
+
+    def on_train_start(self, trainer, state):
+        if self.monitor not in state['meters']:
+            msg = 'Meter <{}> not found'.format(self.monitor)
+            raise MeterNotFoundError(msg)
 
     def on_terminated(self, trainer, state):
         super(PlotLogger, self)._teardown()

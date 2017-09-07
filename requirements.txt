@@ -3,3 +3,5 @@ visdom
 Pillow
 tqdm
 torch
+tensorflow-tensorboard
+tensorboard-pytorch

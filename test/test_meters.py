@@ -3,13 +3,15 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-15 14:21
-# Last modified: 2017-08-15 14:43
+# Last modified: 2017-09-07 16:56
 # Filename: test_meters.py
 # Description:
 import time
 import unittest
+import numpy as np
 
 from torchtools.meters import AverageMeter, TimeMeter
+from torchtools.meters import EpochAverageMeter, BatchAverageMeter
 
 from helpers import ValueObject
 
@@ -18,22 +20,61 @@ class TestAverageMeter(unittest.TestCase):
     def setUp(self):
         self.meter = AverageMeter('loss')
 
-    def assertMeter(self, meter, n, sum, var):
-        self.assertEqual(meter.n, n)
-        self.assertEqual(meter.sum, sum)
-        self.assertEqual(meter.var, var)
-
     def test_add(self):
         meter = self.meter
-        self.assertMeter(meter, 0, 0, 0)
+        self.assertIs(meter.value, np.nan)
 
         trainer = None
         state = {}
         state['loss'] = ValueObject(10)
-
         meter.on_forward_end(trainer, state)
-        self.assertMeter(meter, 1, 10, 100)
         self.assertEqual(meter.value, 10)
+
+        state['loss'] = ValueObject(5)
+        meter.on_forward_end(trainer, state)
+        self.assertEqual(meter.value, 7.5)
+
+
+class TestEpochAverageMeter(unittest.TestCase):
+    def setUp(self):
+        self.meter = EpochAverageMeter('loss')
+
+    def test_add(self):
+        meter = self.meter
+        self.assertIs(meter.value, np.nan)
+
+        trainer = None
+        state = {}
+        state['loss'] = ValueObject(10)
+        meter.on_forward_end(trainer, state)
+        self.assertEqual(meter.value, 10)
+
+        meter.on_epoch_start(trainer, state)
+
+        state['loss'] = ValueObject(5)
+        meter.on_forward_end(trainer, state)
+        self.assertEqual(meter.value, 5)
+
+
+class TestBatchAverageMeter(unittest.TestCase):
+    def setUp(self):
+        self.meter = BatchAverageMeter('loss')
+
+    def test_add(self):
+        meter = self.meter
+        self.assertIs(meter.value, np.nan)
+
+        trainer = None
+        state = {}
+        state['loss'] = ValueObject(10)
+        meter.on_forward_end(trainer, state)
+        self.assertEqual(meter.value, 10)
+
+        meter.on_batch_start(trainer, state)
+
+        state['loss'] = ValueObject(5)
+        meter.on_forward_end(trainer, state)
+        self.assertEqual(meter.value, 5)
 
 
 class TestTimeMeter(unittest.TestCase):

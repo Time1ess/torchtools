@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-15 12:28
-# Last modified: 2017-08-15 19:38
+# Last modified: 2017-09-07 21:54
 # Filename: test_callbacks.py
 # Description:
 import os
@@ -16,7 +16,7 @@ import torch
 
 from torchtools.callbacks import EarlyStopping, CSVLogger
 from torchtools.callbacks import LRScheduler, ExpLRScheduler, ReduceLROnPlateau
-from torchtools.callbacks import ModelCheckPoint
+from torchtools.callbacks import ModelCheckPoint, TensorBoardLogger
 from torchtools.callbacks import EpochPlotLogger, BatchPlotLogger
 
 from helpers import FakeModel, FakeDatasetLoader
@@ -178,32 +178,45 @@ class TestModelCheckPoint(unittest.TestCase):
 
 class TestPlotLogger(unittest.TestCase):
     def test_epoch_plot_logger(self):
-        plot_logger = EpochPlotLogger('train', 'loss', 'line')
+        plot_logger = EpochPlotLogger('train', 'loss', 3, 'line')
 
         trainer = FakeTrainer()
         state = {}
         state['meters'] = {}
-        state['meters']['loss'] = ValueObject(5)
-        state['epochs'] = randint(0, 100)
+        val0, val1 = ValueObject(randint(0, 100)), ValueObject(randint(0, 100))
+        epoch0, epoch1 = randint(0, 100), randint(0, 100)
+        state['meters']['loss'] = val0
+        state['epochs'] = epoch0
         plot_logger.on_epoch_end(trainer, state)
-        self.assertEqual(dict(plot_logger.data_cache), {})
+        self.assertEqual(dict(plot_logger.data_cache),
+                         {'x': [epoch0], 'y': [val0.value]})
+        state['meters']['loss'] = val1
+        state['epochs'] = epoch1
+        plot_logger.on_epoch_end(trainer, state)
+        self.assertEqual(dict(plot_logger.data_cache),
+                         {'x': [epoch0, epoch1],
+                          'y': [val0.value, val1.value]})
 
     def test_batch_plot_logger(self):
-        plot_logger = BatchPlotLogger('test', 'val_loss', 'line')
-        plot_logger.cache_size = 2
+        plot_logger = BatchPlotLogger('val', 'val_loss', 10, 'line')
 
         trainer = FakeTrainer()
         state = {}
+        state['mode'] = 'val'
         state['meters'] = {}
-        state['mode'] = 'test'
-        state['meters']['val_loss'] = ValueObject(randint(0, 100))
-        state['iters'] = randint(0, 100)
-        gt = {'x': [state['iters']], 'y': [state['meters']['val_loss'].value]}
+        val0, val1 = ValueObject(randint(0, 100)), ValueObject(randint(0, 100))
+        iters0, iters1 = randint(0, 100), randint(0, 100)
+        state['meters']['val_loss'] = val0
+        state['iters'] = iters0
         plot_logger.on_batch_end(trainer, state)
-        self.assertEqual(dict(plot_logger.data_cache), gt)
-
+        self.assertEqual(dict(plot_logger.data_cache),
+                         {'x': [iters0], 'y': [val0.value]})
+        state['meters']['val_loss'] = val1
+        state['iters'] = iters1
         plot_logger.on_batch_end(trainer, state)
-        self.assertEqual(dict(plot_logger.data_cache), {})
+        self.assertEqual(dict(plot_logger.data_cache),
+                         {'x': [iters0, iters1],
+                          'y': [val0.value, val1.value]})
 
 
 class TestReduceLROnPlateau(unittest.TestCase):
@@ -229,6 +242,25 @@ class TestReduceLROnPlateau(unittest.TestCase):
         lrs = [d['lr'] for d in optimizer.param_groups]
         for lr, gt_lr in zip(lrs, gt_lrs):
             self.assertAlmostEqual(lr, gt_lr, 2)
+
+
+class TestTensorBoardLogger(unittest.TestCase):
+    def test_log_scalar(self):
+        tb = TensorBoardLogger()
+
+        trainer = FakeTrainer()
+        state = {}
+        state['meters'] = {}
+        val0, val1 = ValueObject(randint(0, 100)), ValueObject(randint(0, 100))
+        val0.reset_mode = 0b10
+        val1.reset_mode = 0b10
+        epoch0, epoch1 = randint(0, 100), randint(0, 100)
+        state['meters']['loss'] = val0
+        state['epochs'] = epoch0
+        tb.on_epoch_end(trainer, state)
+        state['meters']['loss'] = val1
+        state['epochs'] = epoch1
+        tb.on_epoch_end(trainer, state)
 
 
 if __name__ == '__main__':
