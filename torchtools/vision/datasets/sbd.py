@@ -3,13 +3,12 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-09-07 14:37
-# Last modified: 2017-09-07 15:49
+# Last modified: 2017-09-07 22:19
 # Filename: sbd.py
 # Description:
 import os.path as osp
 import random
 
-import numpy as np
 import torch
 
 from scipy.io import loadmat

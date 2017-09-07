@@ -3,13 +3,12 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-17 10:53
-# Last modified: 2017-09-07 15:49
+# Last modified: 2017-09-07 22:19
 # Filename: voc.py
 # Description:
 import os.path as osp
 import random
 
-import numpy as np
 import torch
 
 from PIL import Image
@@ -41,7 +40,7 @@ class VOCClassSegmentation(Dataset):
     def __getitem__(self, idx):
         uid = self.phase_list[idx]
         input_path = osp.join(self.base_dir, 'JPEGImages', uid + '.jpg')
-        target_path = osp.join(self.base_dir, 'SegmentationClass', uid + '.png')
+        target_path = osp.join(self.base_dir, 'SegmentationClass', uid+'.png')
 
         input = Image.open(input_path).convert('RGB')
         target = Image.open(target_path)

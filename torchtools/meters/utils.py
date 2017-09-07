@@ -3,9 +3,12 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-09-07 21:24
-# Last modified: 2017-09-07 21:25
+# Last modified: 2017-09-07 22:18
 # Filename: utils.py
 # Description:
+import numpy as np
+
+
 def fast_hist(label_true, label_pred, n_class):
     mask = (label_true >= 0) & (label_true < n_class)
     hist = np.bincount(
@@ -32,4 +35,3 @@ def label_accuracy_score(label_trues, label_preds, n_class):
     freq = hist.sum(axis=1) / hist.sum()
     fwavacc = (freq[freq > 0] * iu[freq > 0]).sum()
     return acc, acc_cls, mean_iu, fwavacc
-

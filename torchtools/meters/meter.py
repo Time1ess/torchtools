@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-14 21:17
-# Last modified: 2017-09-07 21:51
+# Last modified: 2017-09-07 22:17
 # Filename: meter.py
 # Description:
 from ..callbacks import Hook
@@ -15,6 +15,7 @@ EPOCH_RESET = 0b10
 
 class Meter(Hook):
     reset_mode = NO_RESET
+
     def __init__(self, name, *args, **kwargs):
         super(Meter, self).__init__(*args, **kwargs)
         self.reset()
@@ -33,11 +34,13 @@ class Meter(Hook):
 
 class EpochResetMeter(Meter):
     reset_mode = EPOCH_RESET
+
     def on_epoch_start(self, trainer, state):
         self.reset()
 
 
 class BatchResetMeter(Meter):
     reset_mode = BATCH_RESET
+
     def on_batch_start(self, trainer, state):
         self.reset()

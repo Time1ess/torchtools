@@ -3,11 +3,9 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-13 13:43
-# Last modified: 2017-09-07 20:23
+# Last modified: 2017-09-07 22:18
 # Filename: visdom_plot.py
 # Description:
-import sys
-
 import numpy as np
 import visdom
 

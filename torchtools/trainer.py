@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-08 19:34
-# Last modified: 2017-09-07 16:29
+# Last modified: 2017-09-07 22:16
 # Filename: trainer.py
 # Description:
 import functools
@@ -36,7 +36,8 @@ class ModelTrainer(object):
     hook_entries = [
         'on_train_start', 'on_epoch_start', 'on_batch_start',
         'on_forward_end', 'on_batch_end', 'on_epoch_end',
-        'on_train_end', 'on_validate_start', 'on_validate_end', 'on_terminated']
+        'on_train_end', 'on_validate_start', 'on_validate_end',
+        'on_terminated']
     trainer_ended = False
 
     def __init__(self, model, train_data_loader, criterion,
