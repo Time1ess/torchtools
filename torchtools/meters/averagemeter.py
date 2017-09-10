@@ -3,15 +3,17 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-14 21:18
-# Last modified: 2017-09-07 21:49
+# Last modified: 2017-09-10 12:45
 # Filename: averagemeter.py
 # Description:
 import numpy as np
 
-from .meter import Meter, EpochResetMeter, BatchResetMeter
+from .meter import Meter, EpochResetMeter, BatchResetMeter, SCALAR_METER
 
 
 class AverageMeter(Meter):
+    meter_type = SCALAR_METER
+
     def __init__(self, *args, **kwargs):
         self.values = []
         super(AverageMeter, self).__init__(*args, **kwargs)

@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-10 13:56
-# Last modified: 2017-09-07 20:27
+# Last modified: 2017-09-10 15:23
 # Filename: exceptions.py
 # Description:
 
@@ -25,6 +25,10 @@ class TrainerTerminated(TorchToolsException):
 
 
 class MeterNotFoundError(TorchToolsException):
+    pass
+
+
+class MeterNoValueError(TorchToolsException):
     pass
 
 

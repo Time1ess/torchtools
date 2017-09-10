@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-09 12:15
-# Last modified: 2017-09-07 17:26
+# Last modified: 2017-09-10 16:54
 # Filename: full_tests.py
 # Description:
 import shutil
@@ -78,7 +78,7 @@ class Net(nn.Module):
         self.bn5 = nn.BatchNorm2d(128)
         self.bn6 = nn.BatchNorm2d(128)
         self.pool = nn.MaxPool2d(2, 2)
-        self.fc1 = nn.Linear(128*4*4, 1024)
+        self.fc1 = nn.Linear(128 * 4 * 4, 1024)
         self.fc2 = nn.Linear(1024, 1024)
         self.fc3 = nn.Linear(1024, 128)
         self.fc4 = nn.Linear(128, 10)
@@ -100,7 +100,7 @@ class Net(nn.Module):
         x = F.relu(self.bn6(self.conv6(x)))  # 8 x 8 x 128
         x = self.pool(x)  # 4 x 4 x 128
 
-        x = x.view(-1, 128*4*4)
+        x = x.view(-1, 128 * 4 * 4)
         x = F.relu(self.fc1(x))
         x = F.relu(self.fc2(x))
         x = F.relu(self.fc3(x))

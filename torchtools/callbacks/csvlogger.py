@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-14 21:35
-# Last modified: 2017-08-15 11:10
+# Last modified: 2017-09-10 16:52
 # Filename: csvlogger.py
 # Description:
 import os
@@ -25,7 +25,7 @@ class CSVLogger(Callback):
         super(CSVLogger, self).__init__()
         if not os.path.exists(directory):
             os.makedirs(directory)
-        self.fpath = os.path.join(directory, fname)+'.'+ext
+        self.fpath = os.path.join(directory, fname) + '.' + ext
         self.sep = separator
         self.writer = None
         if keys is None:

@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-08 19:34
-# Last modified: 2017-09-07 22:16
+# Last modified: 2017-09-10 15:45
 # Filename: trainer.py
 # Description:
 import functools
@@ -140,12 +140,13 @@ class ModelTrainer(object):
         iter_epoch = trange(max_epoch, initial=state['epochs'], unit='epoch')
         iter_epoch.set_description('Train')
         for epoch in iter_epoch:
-            state['epochs'] = epoch
+            state['epochs'] = epoch + 1
             self.on_hook('on_epoch_start', state)
 
             iter_data = tqdm(data_loader, unit=' batches')
             iter_data.set_description('Epoch ' + str(epoch))
             for batch in iter_data:
+                state['iters'] += 1
                 if use_cuda:
                     input = Variable(batch[0].cuda())
                     target = Variable(batch[1].cuda())
@@ -176,7 +177,6 @@ class ModelTrainer(object):
                 self.on_hook('on_batch_end', state)
                 if self.trainer_ended:
                     break
-                state['iters'] += 1
             self.on_hook('on_epoch_end', state)
             if self.trainer_ended:
                 break
@@ -204,6 +204,7 @@ class ModelTrainer(object):
         iter_data = tqdm(data_loader, unit=' batches')
         iter_data.set_description('Test')
         for batch in iter_data:
+            state['iters'] += 1
             if use_cuda:
                 input = Variable(batch[0].cuda(), volatile=True)
                 target = Variable(batch[1].cuda(), volatile=True)
@@ -228,6 +229,5 @@ class ModelTrainer(object):
 
             closure()
             self.on_hook('on_batch_end', state)
-            state['iters'] += 1
         self.on_hook('on_validate_end', state)
         return state

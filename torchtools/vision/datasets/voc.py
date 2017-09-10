@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-17 10:53
-# Last modified: 2017-09-07 22:19
+# Last modified: 2017-09-10 16:51
 # Filename: voc.py
 # Description:
 import os.path as osp
@@ -27,7 +27,7 @@ class VOCClassSegmentation(Dataset):
         self.base_dir = base_dir
         self.phase = phase
         phase_file = osp.join(base_dir, 'ImageSets',
-                              'Segmentation', phase+'.txt')
+                              'Segmentation', phase + '.txt')
         self.phase_list = []
         with open(phase_file, 'r') as f:
             for uid in f:
@@ -40,7 +40,8 @@ class VOCClassSegmentation(Dataset):
     def __getitem__(self, idx):
         uid = self.phase_list[idx]
         input_path = osp.join(self.base_dir, 'JPEGImages', uid + '.jpg')
-        target_path = osp.join(self.base_dir, 'SegmentationClass', uid+'.png')
+        target_path = osp.join(self.base_dir, 'SegmentationClass',
+                               uid + '.png')
 
         input = Image.open(input_path).convert('RGB')
         target = Image.open(target_path)

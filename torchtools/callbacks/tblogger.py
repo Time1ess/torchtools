@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-09-07 20:05
-# Last modified: 2017-09-07 21:54
+# Last modified: 2017-09-10 16:53
 # Filename: tblogger.py
 # Description:
 from .callback import Callback
@@ -31,17 +31,19 @@ class TensorBoardLogger(Callback):
     def board(self):
         return self._tensorboard
 
-    def log(self, log_type, *args, **kwargs):
-        if not hasattr(self, 'log_'+log_type):
+    def log(self, global_step, meter):
+        log_type = meter.meter_type
+        if not hasattr(self, 'log_' + log_type):
             raise LogTypeError('No such log type: {}'.format(log_type))
-        method = getattr(self, 'log_'+log_type)
-        method(*args, **kwargs)
+        method = getattr(self, 'log_' + log_type)
+        step = getattr(meter, 'step', global_step)
+        method(meter.name, meter.value, step)
 
-    def log_image(self):
-        pass
+    def log_image(self, tag, img_tensor, step=None):
+        self.board.add_image(tag, img_tensor, step)
 
-    def log_scalar(self, tag, x, y):
-        self.board.add_scalar(tag, y, x)
+    def log_scalar(self, tag, scalar_value, step=None):
+        self.board.add_scalar(tag, scalar_value, step)
 
     def log_graph(self):
         pass
@@ -52,16 +54,19 @@ class TensorBoardLogger(Callback):
     def log_text(self):
         pass
 
+    def log_audio(self):
+        pass
+
     def on_batch_end(self, trainer, state):
         iters = state['iters']
         for name, meter in state['meters'].items():
             if meter.reset_mode == _meter.BATCH_RESET and \
                     name not in self.ignores:
-                self.log('scalar', name, iters, meter.value)
+                self.log(iters, meter)
 
     def on_epoch_end(self, trainer, state):
         epochs = state['epochs']
         for name, meter in state['meters'].items():
             if meter.reset_mode == _meter.EPOCH_RESET and \
                     name not in self.ignores:
-                self.log('scalar', name, epochs, meter.value)
+                self.log(epochs, meter)

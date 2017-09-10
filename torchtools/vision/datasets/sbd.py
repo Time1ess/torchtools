@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-09-07 14:37
-# Last modified: 2017-09-07 22:19
+# Last modified: 2017-09-10 16:52
 # Filename: sbd.py
 # Description:
 import os.path as osp
@@ -27,7 +27,7 @@ class SBDClassSegmentation(Dataset):
                  pair_trans=None):
         self.base_dir = base_dir
         self.phase = phase
-        phase_file = osp.join(base_dir, phase+'.txt')
+        phase_file = osp.join(base_dir, phase + '.txt')
         self.phase_list = []
         with open(phase_file, 'r') as f:
             for uid in f:

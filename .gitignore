@@ -6,3 +6,4 @@ torchtools.egg-info/
 */**/*.pyc
 .*
 !.travis.yml
+test/logs/

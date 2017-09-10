@@ -3,10 +3,13 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-09-07 21:24
-# Last modified: 2017-09-07 22:18
+# Last modified: 2017-09-10 16:34
 # Filename: utils.py
 # Description:
+import torch
 import numpy as np
+
+from PIL import Image
 
 
 def fast_hist(label_true, label_pred, n_class):
@@ -35,3 +38,22 @@ def label_accuracy_score(label_trues, label_preds, n_class):
     freq = hist.sum(axis=1) / hist.sum()
     fwavacc = (freq[freq > 0] * iu[freq > 0]).sum()
     return acc, acc_cls, mean_iu, fwavacc
+
+
+def build_ss_img_tensor(result, palette):
+    """
+    Build a Semantic result image from output with palette.
+
+    Parameters:
+        * result(torch.Tensor): H x W, pixel classification result
+        * palette(PIL.ImagePalette): Palette
+
+    Return:
+        * img(torch.Tensor): 3 x H x W
+    """
+
+    img = Image.fromarray(result, mode='P')
+    img.putpalette(palette)
+    img = img.convert('RGB')
+    img = np.array(img).transpose(2, 0, 1)
+    return torch.from_numpy(img).long()
