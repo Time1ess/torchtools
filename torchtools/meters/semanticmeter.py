@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-09-10 14:59
-# Last modified: 2017-09-11 14:41
+# Last modified: 2017-09-10 18:46
 # Filename: semanticmeter.py
 # Description:
 import pickle
@@ -60,8 +60,11 @@ class SemSegVisualizer(BatchResetMixin):
         self.step += 1
 
     def on_batch_start(self, trainer, state):
+        if state['mode'] != self.meter_mode:
+            return
         if self.fpi == self.target_fpi:
             self.fpi = 0
+            self.reset()
 
     @property
     def can_call(self):
