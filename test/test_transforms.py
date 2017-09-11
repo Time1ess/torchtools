@@ -3,17 +3,19 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-09-07 17:07
-# Last modified: 2017-09-10 16:54
+# Last modified: 2017-09-11 14:34
 # Filename: test_transforms.py
 # Description:
 import unittest
 
+import torch
 import numpy as np
 
 from PIL import Image
 
 from torchtools.vision.transforms import PairRandomCrop, ReLabel, ToArray
 from torchtools.vision.transforms import PairRandomHorizontalFlip
+from torchtools.vision.transforms import ToTensor, Transpose, IndexSwap
 
 
 class TestPairRandomCrop(unittest.TestCase):
@@ -59,6 +61,34 @@ class TestToArray(unittest.TestCase):
         toarray = ToArray()
         array_x = toarray(x)
         self.assertIsInstance(array_x, np.ndarray)
+
+
+class TestToTensor(unittest.TestCase):
+    def test_no_rescale(self):
+        x = np.arange(0, 64 * 3).reshape(8, 8, 3)
+        tensor = ToTensor(False)(x)
+        self.assertAlmostEqual(tensor.max(), 64*3-1)
+
+    def test_rescale(self):
+        x = np.arange(0, 64 * 3).reshape(8, 8, 3)
+        tensor = ToTensor()(x)
+        self.assertAlmostEqual(tensor.max(), (64*3-1)/255.0)
+
+
+class TestTranspose(unittest.TestCase):
+    def test_trans(self):
+        x = np.arange(0, 64 * 3).reshape(8, 8, 3)
+        transposed_x = np.transpose(x, (2, 0, 1))
+        tensor = Transpose([(0, 2), (1, 2)])(torch.from_numpy(x))
+        self.assertEqual(tensor.size(), transposed_x.shape)
+
+
+class TestIndexSwap(unittest.TestCase):
+    def test_swap(self):
+        x = np.arange(0, 64 * 3).reshape(8, 8, 3)
+        swap_x_tensor = torch.from_numpy(x[:, :, ::-1].copy())
+        tensor = IndexSwap(2, [2, 1, 0])(torch.from_numpy(x))
+        self.assertTrue(torch.equal(swap_x_tensor, tensor))
 
 
 if __name__ == '__main__':

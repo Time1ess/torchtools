@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-17 10:53
-# Last modified: 2017-09-11 10:57
+# Last modified: 2017-09-11 14:22
 # Filename: voc.py
 # Description:
 import os.path as osp
@@ -15,12 +15,17 @@ from PIL import Image
 from torch.utils.data import Dataset
 from torchvision import transforms as T
 from torchtools.vision.transforms import PairRandomCrop, ReLabel, ToArray
-from torchtools.vision.transforms import PairRandomHorizontalFlip
+from torchtools.vision.transforms import PairRandomHorizontalFlip, ToTensor
 
 
 class VOCClassSegmentation(Dataset):
     mean_rgb = (122.67891434, 116.66876762, 104.00698793)
+    mean_bgr = (104.00698793, 116.66876762, 122.67891434)
     mean_rgb_norm = tuple(v / 255.0 for v in mean_rgb)
+    mean_bgr_norm = tuple(v / 255.0 for v in mean_bgr)
+
+    std_rgb = (58.395, 57.12, 57.375)
+    std_rgb_norm = tuple(v / 255.0 for v in std_rgb)
 
     def __init__(self, base_dir, phase, input_trans=None, target_trans=None,
                  pair_trans=None):
@@ -64,8 +69,11 @@ class VOCClassSegmentation(Dataset):
 
 def main():
     input_trans = T.Compose([
-        T.ToTensor(),
-        T.Normalize(VOCClassSegmentation.mean_rgb_norm, (1, 1, 1))])
+        ToTensor(True),
+        T.Normalize(
+            VOCClassSegmentation.mean_rgb_norm,
+            VOCClassSegmentation.std_rgb_norm),
+        ])
     pair_trans = T.Compose([
         T.Scale(512),
         PairRandomCrop(512),
@@ -79,8 +87,10 @@ def main():
         pair_trans=pair_trans)
     print(len(voc))
     item = random.choice(voc)
-    print(type(item[0]), type(item[1]))
     print(item[0].numpy().max())
+    print(item[0].numpy().min())
+    print(item[0].numpy().mean())
+    print(item[0].numpy().std())
     print(item[1].numpy().max())
 
 

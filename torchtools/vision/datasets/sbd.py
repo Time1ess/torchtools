@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-09-07 14:37
-# Last modified: 2017-09-10 16:52
+# Last modified: 2017-09-11 13:56
 # Filename: sbd.py
 # Description:
 import os.path as osp
@@ -21,7 +21,12 @@ from torchtools.vision.transforms import PairRandomHorizontalFlip
 
 class SBDClassSegmentation(Dataset):
     mean_rgb = (116.92473437, 111.91541178, 103.47193476)
+    mean_bgr = (103.47193476, 111.91541178, 116.92473437)
     mean_rgb_norm = tuple(v / 255.0 for v in mean_rgb)
+    mean_bgr_norm = tuple(v / 255.0 for v in mean_bgr)
+
+    std_rgb = (58.395, 57.12, 57.375)
+    std_rgb_norm = tuple(v / 255.0 for v in std_rgb)
 
     def __init__(self, base_dir, phase, input_trans=None, target_trans=None,
                  pair_trans=None):

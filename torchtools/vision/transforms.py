@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-08 19:25
-# Last modified: 2017-09-07 15:45
+# Last modified: 2017-09-11 14:30
 # Filename: transforms.py
 # Description:
 import random
@@ -13,8 +13,10 @@ import numbers
 from typing import Iterable
 
 import numpy as np
+import torch
 
 from PIL import ImageOps, Image
+from torchvision.transforms import ToTensor as _ToTensor
 
 
 class PairRandomCrop(object):
@@ -114,3 +116,68 @@ class ToArray(object):
     """Convert PIL Image to Numpy array"""
     def __call__(self, img):
         return np.array(img, dtype=np.uint8)
+
+
+class NoReScaleToTensor(object):
+    """Converts a PIL.Image or numpy.ndarray (H x W x C) in the range
+    to a torch.FloatTensor of shape (C x H x W) .
+    """
+
+    def __call__(self, pic):
+        if isinstance(pic, np.ndarray):
+            # handle numpy array
+            img = torch.from_numpy(pic.transpose((2, 0, 1)))
+            # backard compability
+            return img.float()
+        # handle PIL Image
+        if pic.mode == 'I':
+            img = torch.from_numpy(np.array(pic, np.int32, copy=False))
+        elif pic.mode == 'I;16':
+            img = torch.from_numpy(np.array(pic, np.int16, copy=False))
+        else:
+            img = torch.ByteTensor(
+                torch.ByteStorage.from_buffer(pic.tobytes()))
+        # PIL image mode: 1, L, P, I, F, RGB, YCbCr, RGBA, CMYK
+        if pic.mode == 'YCbCr':
+            nchannel = 3
+        elif pic.mode == 'I;16':
+            nchannel = 1
+        else:
+            nchannel = len(pic.mode)
+        img = img.view(pic.size[1], pic.size[0], nchannel)
+        # put it from HWC to CHW format
+        # yikes, this transpose takes 80% of the loading time/CPU
+        img = img.transpose(0, 1).transpose(0, 2).contiguous()
+        if isinstance(img, torch.ByteTensor):
+            return img.float()
+        else:
+            return img
+
+
+def ToTensor(rescale=True):
+    if rescale:
+        return _ToTensor()
+    else:
+        return NoReScaleToTensor()
+
+
+class Transpose(object):
+    def __init__(self, dim_pairs):
+        self.dim_pairs = dim_pairs
+
+    def __call__(self, tensor):
+        for dim0, dim1 in self.dim_pairs:
+            tensor = torch.transpose(tensor, dim0, dim1)
+        return tensor.contiguous()
+
+
+class IndexSwap(object):
+    def __init__(self, dim, new_idx):
+        self.dim = dim
+        self.new_idx = new_idx
+
+    def __call__(self, tensor):
+        new_idx = self.new_idx
+        dim = self.dim
+        index = torch.LongTensor(new_idx)
+        return torch.index_select(tensor, dim, index)
