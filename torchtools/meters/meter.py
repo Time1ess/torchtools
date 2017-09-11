@@ -3,10 +3,12 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-14 21:17
-# Last modified: 2017-09-11 14:36
+# Last modified: 2017-09-11 15:24
 # Filename: meter.py
 # Description:
 import numpy as np
+
+from collections import deque
 
 from ..callbacks import Hook
 
@@ -66,7 +68,7 @@ class AverageMeter(Meter):
     meter_type = SCALAR_METER
 
     def __init__(self, *args, **kwargs):
-        self.values = []
+        self.values = deque()
         super(AverageMeter, self).__init__(*args, **kwargs)
 
     def reset(self):
@@ -95,3 +97,15 @@ class EpochAverageMeter(EpochResetMixin, AverageMeter):
 
 class BatchAverageMeter(BatchResetMixin, AverageMeter):
     pass
+
+
+class FixSizeAverageMeter(AverageMeter):
+    def __init__(self, name, meter_mode, fix_size, *args, **kwargs):
+        self.fix_size = fix_size
+        super(FixSizeAverageMeter, self).__init__(name, meter_mode, *args,
+                                                  **kwargs)
+
+    def add(self, value):
+        if len(self.values) == self.fix_size:
+            self.values.popleft()
+        super(FixSizeAverageMeter, self).add(value)

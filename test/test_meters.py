@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-15 14:21
-# Last modified: 2017-09-11 15:00
+# Last modified: 2017-09-11 15:26
 # Filename: test_meters.py
 # Description:
 import time
@@ -14,7 +14,7 @@ import torch
 
 from torch.autograd import Variable
 from torchtools.meters import TimeMeter, IoUMeter
-from torchtools.meters import BatchLossMeter, EpochLossMeter
+from torchtools.meters import BatchLossMeter, EpochLossMeter, FixSizeLossMeter
 from torchtools.meters import SemSegVisualizer
 from torchtools.exceptions import MeterNoValueError
 
@@ -41,6 +41,36 @@ class TestEpochLossMeter(unittest.TestCase):
         state['loss'] = ValueObject(5)
         meter.on_forward_end(trainer, state)
         self.assertEqual(meter.value, 5)
+
+
+class TestFixSizeLossMeter(unittest.TestCase):
+    def setUp(self):
+        self.meter = FixSizeLossMeter('loss', 'train', 2)
+
+    def test_add(self):
+        meter = self.meter
+        self.assertIs(meter.value, np.nan)
+
+        trainer = None
+        state = {}
+        state['mode'] = 'train'
+        state['loss'] = ValueObject(10)
+        meter.on_forward_end(trainer, state)
+        self.assertEqual(meter.value, 10)
+
+        meter.on_epoch_start(trainer, state)
+
+        state['loss'] = ValueObject(5)
+        meter.on_forward_end(trainer, state)
+        self.assertEqual(meter.value, 7.5)
+
+        state['loss'] = ValueObject(8)
+        meter.on_forward_end(trainer, state)
+        self.assertEqual(meter.value, 6.5)
+
+        state['loss'] = ValueObject(20)
+        meter.on_forward_end(trainer, state)
+        self.assertEqual(meter.value, 14)
 
 
 class TestBatchLossMeter(unittest.TestCase):
