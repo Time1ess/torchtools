@@ -3,13 +3,14 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-09-07 21:24
-# Last modified: 2017-09-10 16:34
+# Last modified: 2017-09-11 11:08
 # Filename: utils.py
 # Description:
 import torch
 import numpy as np
 
 from PIL import Image
+from torchvision import transforms as T
 
 
 def fast_hist(label_true, label_pred, n_class):
@@ -52,8 +53,7 @@ def build_ss_img_tensor(result, palette):
         * img(torch.Tensor): 3 x H x W
     """
 
-    img = Image.fromarray(result, mode='P')
+    img = Image.fromarray(np.uint8(result), mode='P')
     img.putpalette(palette)
-    img = img.convert('RGB')
-    img = np.array(img).transpose(2, 0, 1)
-    return torch.from_numpy(img).long()
+    img = img.convert()
+    return T.ToTensor()(img)

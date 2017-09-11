@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-15 12:28
-# Last modified: 2017-09-07 21:54
+# Last modified: 2017-09-11 12:03
 # Filename: test_callbacks.py
 # Description:
 import os
@@ -254,6 +254,9 @@ class TestTensorBoardLogger(unittest.TestCase):
         val0, val1 = ValueObject(randint(0, 100)), ValueObject(randint(0, 100))
         val0.reset_mode = 0b10
         val1.reset_mode = 0b10
+        val0.can_call = False
+        val1.can_call = False
+
         epoch0, epoch1 = randint(0, 100), randint(0, 100)
         state['meters']['loss'] = val0
         state['epochs'] = epoch0

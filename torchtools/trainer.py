@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-08 19:34
-# Last modified: 2017-09-10 15:45
+# Last modified: 2017-09-11 12:00
 # Filename: trainer.py
 # Description:
 import functools
@@ -40,13 +40,14 @@ class ModelTrainer(object):
         'on_terminated']
     trainer_ended = False
 
-    def __init__(self, model, train_data_loader, criterion,
-                 optimizer, val_data_loader=None, use_cuda=True):
+    def __init__(self, model, train_data_loader, criterion, optimizer,
+                 val_data_loader=None, use_cuda=True, device_id=None):
         self.model = model
         self.train_data_loader = train_data_loader
         self.criterion = criterion
         self.optimizer = optimizer
         self.val_data_loader = val_data_loader
+        self.device_id = device_id
         self.use_cuda = use_cuda and torch.cuda.is_available()
 
         self.callback_hooks = {k: [] for k in self.hook_entries}
@@ -122,6 +123,7 @@ class ModelTrainer(object):
         optimizer = self.optimizer
         meters = self.meters
         use_cuda = self.use_cuda
+        device_id = self.device_id
         self.trainer_ended = False
 
         state = {
@@ -148,8 +150,8 @@ class ModelTrainer(object):
             for batch in iter_data:
                 state['iters'] += 1
                 if use_cuda:
-                    input = Variable(batch[0].cuda())
-                    target = Variable(batch[1].cuda())
+                    input = Variable(batch[0].cuda(device_id))
+                    target = Variable(batch[1].cuda(device_id))
                 else:
                     input = Variable(batch[0])
                     target = Variable(batch[1])
@@ -192,6 +194,7 @@ class ModelTrainer(object):
         criterion = self.criterion
         meters = self.meters
         use_cuda = self.use_cuda
+        device_id = self.device_id
 
         state = {
             'model': model,
@@ -206,8 +209,8 @@ class ModelTrainer(object):
         for batch in iter_data:
             state['iters'] += 1
             if use_cuda:
-                input = Variable(batch[0].cuda(), volatile=True)
-                target = Variable(batch[1].cuda(), volatile=True)
+                input = Variable(batch[0].cuda(device_id), volatile=True)
+                target = Variable(batch[1].cuda(device_id), volatile=True)
             else:
                 input = Variable(batch[0], volatile=True)
                 target = Variable(batch[1], volatile=True)

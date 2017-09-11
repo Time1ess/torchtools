@@ -3,15 +3,15 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-14 21:19
-# Last modified: 2017-09-10 12:46
+# Last modified: 2017-09-11 14:30
 # Filename: timemeter.py
 # Description:
 from datetime import datetime
 
-from .meter import EpochResetMeter, SCALAR_METER
+from .meter import EpochResetMixin, SCALAR_METER
 
 
-class TimeMeter(EpochResetMeter):
+class TimeMeter(EpochResetMixin):
     meter_type = SCALAR_METER
 
     def on_epoch_start(self, trainer, state):

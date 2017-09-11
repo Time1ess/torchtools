@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-09-07 20:05
-# Last modified: 2017-09-10 16:53
+# Last modified: 2017-09-11 12:03
 # Filename: tblogger.py
 # Description:
 from .callback import Callback
@@ -61,12 +61,12 @@ class TensorBoardLogger(Callback):
         iters = state['iters']
         for name, meter in state['meters'].items():
             if meter.reset_mode == _meter.BATCH_RESET and \
-                    name not in self.ignores:
+                    name not in self.ignores and meter.can_call:
                 self.log(iters, meter)
 
     def on_epoch_end(self, trainer, state):
         epochs = state['epochs']
         for name, meter in state['meters'].items():
             if meter.reset_mode == _meter.EPOCH_RESET and \
-                    name not in self.ignores:
+                    name not in self.ignores and meter.can_call:
                 self.log(epochs, meter)

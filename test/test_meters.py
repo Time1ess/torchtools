@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-15 14:21
-# Last modified: 2017-09-10 16:49
+# Last modified: 2017-09-11 14:36
 # Filename: test_meters.py
 # Description:
 import time
@@ -14,17 +14,17 @@ import numpy as np
 import torch
 
 from torch.autograd import Variable
-from torchtools.meters import AverageMeter, TimeMeter, IoUMeter
-from torchtools.meters import EpochAverageMeter, BatchAverageMeter
+from torchtools.meters import TimeMeter, IoUMeter
+from torchtools.meters import LossMeter, BatchLossMeter, EpochLossMeter
 from torchtools.meters import SemSegVisualizer
 from torchtools.exceptions import MeterNoValueError
 
 from helpers import ValueObject
 
 
-class TestAverageMeter(unittest.TestCase):
+class TestLossMeter(unittest.TestCase):
     def setUp(self):
-        self.meter = AverageMeter('loss')
+        self.meter = LossMeter('loss', 'train', 'loss')
 
     def test_add(self):
         meter = self.meter
@@ -32,6 +32,7 @@ class TestAverageMeter(unittest.TestCase):
 
         trainer = None
         state = {}
+        state['mode'] = 'train'
         state['loss'] = ValueObject(10)
         meter.on_forward_end(trainer, state)
         self.assertEqual(meter.value, 10)
@@ -41,9 +42,9 @@ class TestAverageMeter(unittest.TestCase):
         self.assertEqual(meter.value, 7.5)
 
 
-class TestEpochAverageMeter(unittest.TestCase):
+class TestEpochLossMeter(unittest.TestCase):
     def setUp(self):
-        self.meter = EpochAverageMeter('loss')
+        self.meter = EpochLossMeter('loss', 'train', 'loss')
 
     def test_add(self):
         meter = self.meter
@@ -51,6 +52,7 @@ class TestEpochAverageMeter(unittest.TestCase):
 
         trainer = None
         state = {}
+        state['mode'] = 'train'
         state['loss'] = ValueObject(10)
         meter.on_forward_end(trainer, state)
         self.assertEqual(meter.value, 10)
@@ -62,9 +64,9 @@ class TestEpochAverageMeter(unittest.TestCase):
         self.assertEqual(meter.value, 5)
 
 
-class TestBatchAverageMeter(unittest.TestCase):
+class TestBatchLossMeter(unittest.TestCase):
     def setUp(self):
-        self.meter = BatchAverageMeter('loss')
+        self.meter = BatchLossMeter('loss', 'train', 'loss')
 
     def test_add(self):
         meter = self.meter
@@ -72,6 +74,7 @@ class TestBatchAverageMeter(unittest.TestCase):
 
         trainer = None
         state = {}
+        state['mode'] = 'train'
         state['loss'] = ValueObject(10)
         meter.on_forward_end(trainer, state)
         self.assertEqual(meter.value, 10)
@@ -85,7 +88,7 @@ class TestBatchAverageMeter(unittest.TestCase):
 
 class TestTimeMeter(unittest.TestCase):
     def setUp(self):
-        self.meter = TimeMeter('time')
+        self.meter = TimeMeter('time', 'train')
 
     def test_tick(self):
         trainer = None
@@ -111,7 +114,7 @@ class TestIoUMeter(unittest.TestCase):
         self.num_classes = 10
         self.m = 3
         self.h = self.w = 10
-        self.meter = IoUMeter('validate', self.num_classes, name='IoU')
+        self.meter = IoUMeter('IoU', 'validate', self.num_classes)
 
     def test_iou(self):
         num_classes, m, h, w = self.num_classes, self.m, self.h, self.w
@@ -128,7 +131,7 @@ class TestSemSegVisualizer(unittest.TestCase):
     def setUp(self):
         self.m = 3
         self.h = self.w = 10
-        self.meter = SemSegVisualizer('validate', 'voc', 2, 'seg_visual')
+        self.meter = SemSegVisualizer('seg_visual', 'validate', 'voc', 2)
 
     def test_visual(self):
         m, h, w = self.m, self.h, self.w
@@ -144,7 +147,7 @@ class TestSemSegVisualizer(unittest.TestCase):
         self.assertEqual(meter.fpi, 1)
         self.assertEqual(meter.step, 0)
         meter.on_forward_end(trainer, state)
-        self.assertEqual(meter.fpi, 0)
+        self.assertEqual(meter.fpi, 2)
         self.assertEqual(meter.step, 1)
         self.assertEqual(meter.value.dim(), 3)
 

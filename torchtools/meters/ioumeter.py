@@ -3,12 +3,12 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-09-07 21:22
-# Last modified: 2017-09-10 14:54
+# Last modified: 2017-09-11 14:28
 # Filename: ioumeter.py
 # Description:
 import numpy as np
 
-from .averagemeter import AverageMeter, EpochAverageMeter, BatchAverageMeter
+from .meter import AverageMeter, EpochAverageMeter, BatchAverageMeter
 from .meter import SCALAR_METER
 
 from .utils import fast_hist
@@ -17,14 +17,12 @@ from .utils import fast_hist
 class IoUMeter(AverageMeter):
     meter_type = SCALAR_METER
 
-    def __init__(self, mode, num_classes, *args, **kwargs):
-        super(IoUMeter, self).__init__(*args, **kwargs)
-        self.mode = mode
+    def __init__(self, name, meter_mode, num_classes, *args, **kwargs):
         self.num_classes = num_classes
-        self.reset()
+        super(IoUMeter, self).__init__(name, meter_mode, *args, **kwargs)
 
     def on_forward_end(self, trainer, state):
-        if state['mode'] != self.mode:
+        if state['mode'] != self.meter_mode:
             return
         output = state['output']
         prediction = output.data.max(1)[1].cpu().numpy()[:, :, :]
@@ -49,9 +47,9 @@ class IoUMeter(AverageMeter):
         return value * 100
 
 
-class EpochIoUMeter(IoUMeter, EpochAverageMeter):
+class EpochIoUMeter(EpochAverageMeter, IoUMeter):
     pass
 
 
-class BatchIoUMeter(IoUMeter, BatchAverageMeter):
+class BatchIoUMeter(BatchAverageMeter, IoUMeter):
     pass
