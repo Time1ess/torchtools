@@ -3,11 +3,10 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-15 14:21
-# Last modified: 2017-09-11 14:36
+# Last modified: 2017-09-11 14:41
 # Filename: test_meters.py
 # Description:
 import time
-import math
 import unittest
 
 import numpy as np

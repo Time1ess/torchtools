@@ -3,16 +3,11 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-09-10 14:59
-# Last modified: 2017-09-11 14:31
+# Last modified: 2017-09-11 14:41
 # Filename: semanticmeter.py
 # Description:
 import pickle
-import os
 import os.path as osp
-import inspect
-
-import torch
-import numpy as np
 
 from PIL.ImagePalette import ImagePalette
 from torchvision.utils import make_grid

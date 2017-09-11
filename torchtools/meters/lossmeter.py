@@ -3,12 +3,10 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-14 21:18
-# Last modified: 2017-09-11 14:36
+# Last modified: 2017-09-11 14:42
 # Filename: lossmeter.py
 # Description:
-import numpy as np
-
-from .meter import Meter, EpochAverageMeter, BatchAverageMeter, SCALAR_METER
+from .meter import EpochAverageMeter, BatchAverageMeter, SCALAR_METER
 from .meter import AverageMeter
 
 

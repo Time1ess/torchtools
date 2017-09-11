@@ -3,10 +3,10 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-14 21:20
-# Last modified: 2017-09-11 14:34
+# Last modified: 2017-09-11 14:42
 # Filename: __init__.py
 # Description:
-from .lossmeter import LossMeter, EpochLossMeter, BatchLossMeter
+from .lossmeter import EpochLossMeter, BatchLossMeter
 from .timemeter import TimeMeter
 from .ioumeter import IoUMeter, EpochIoUMeter, BatchIoUMeter
 from .semanticmeter import SemSegVisualizer

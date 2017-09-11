@@ -3,10 +3,9 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-09-07 21:24
-# Last modified: 2017-09-11 11:08
+# Last modified: 2017-09-11 14:41
 # Filename: utils.py
 # Description:
-import torch
 import numpy as np
 
 from PIL import Image
