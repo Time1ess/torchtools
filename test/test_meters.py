@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-15 14:21
-# Last modified: 2017-09-11 15:26
+# Last modified: 2017-09-11 15:44
 # Filename: test_meters.py
 # Description:
 import time
@@ -13,7 +13,7 @@ import numpy as np
 import torch
 
 from torch.autograd import Variable
-from torchtools.meters import TimeMeter, IoUMeter
+from torchtools.meters import TimeMeter, IoUMeter, FixSizeIoUMeter
 from torchtools.meters import BatchLossMeter, EpochLossMeter, FixSizeLossMeter
 from torchtools.meters import SemSegVisualizer
 from torchtools.exceptions import MeterNoValueError
@@ -134,6 +134,40 @@ class TestIoUMeter(unittest.TestCase):
         state['mode'] = 'validate'
         self.meter.on_forward_end(trainer, state)
         self.assertEqual(self.meter.value, 100.0)
+
+
+class TestFixSizeIoUMeter(unittest.TestCase):
+    def setUp(self):
+        self.num_classes = 10
+        self.m = 3
+        self.h = self.w = 10
+        self.meter = FixSizeIoUMeter('IoU', 'validate', 3, self.num_classes)
+
+    def test_iou(self):
+        num_classes, m, h, w = self.num_classes, self.m, self.h, self.w
+        state = {}
+        trainer = None
+        state['output'] = Variable(torch.zeros(m, num_classes, h, w))
+        ones_target = torch.from_numpy(np.ones((m, h, w)).astype(int))
+        zeros_target = torch.from_numpy(np.zeros((m, h, w)).astype(int))
+
+        state['target'] = ones_target
+        state['mode'] = 'validate'
+        self.meter.on_forward_end(trainer, state)
+        self.assertEqual(self.meter.value, 0.0)
+
+        state['target'] = zeros_target
+        self.meter.on_forward_end(trainer, state)
+        self.assertEqual(self.meter.value, 50.0)
+
+        state['target'] = ones_target
+        state['mode'] = 'validate'
+        self.meter.on_forward_end(trainer, state)
+        self.assertAlmostEqual(self.meter.value, 100/3.0)
+
+        state['target'] = zeros_target
+        self.meter.on_forward_end(trainer, state)
+        self.assertAlmostEqual(self.meter.value, 100/3.0*2)
 
 
 class TestSemSegVisualizer(unittest.TestCase):

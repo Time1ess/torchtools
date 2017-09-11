@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-14 21:18
-# Last modified: 2017-09-11 15:24
+# Last modified: 2017-09-11 15:30
 # Filename: lossmeter.py
 # Description:
 from .meter import EpochAverageMeter, BatchAverageMeter, SCALAR_METER

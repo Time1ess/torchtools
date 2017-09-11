@@ -3,13 +3,13 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-09-07 21:22
-# Last modified: 2017-09-11 14:28
+# Last modified: 2017-09-11 15:37
 # Filename: ioumeter.py
 # Description:
 import numpy as np
 
 from .meter import AverageMeter, EpochAverageMeter, BatchAverageMeter
-from .meter import SCALAR_METER
+from .meter import FixSizeAverageMeter, SCALAR_METER
 
 from .utils import fast_hist
 
@@ -52,4 +52,8 @@ class EpochIoUMeter(EpochAverageMeter, IoUMeter):
 
 
 class BatchIoUMeter(BatchAverageMeter, IoUMeter):
+    pass
+
+
+class FixSizeIoUMeter(FixSizeAverageMeter, IoUMeter):
     pass

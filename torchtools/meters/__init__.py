@@ -3,18 +3,18 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-14 21:20
-# Last modified: 2017-09-11 15:24
+# Last modified: 2017-09-11 15:37
 # Filename: __init__.py
 # Description:
 from .meter import Meter
 from .lossmeter import EpochLossMeter, BatchLossMeter, FixSizeLossMeter
 from .timemeter import TimeMeter
-from .ioumeter import IoUMeter, EpochIoUMeter, BatchIoUMeter
+from .ioumeter import IoUMeter, EpochIoUMeter, BatchIoUMeter, FixSizeIoUMeter
 from .semanticmeter import SemSegVisualizer
 
 
 __all__ = ['Meter',
            'EpochLossMeter', 'BatchLossMeter', 'FixSizeLossMeter',
            'TimeMeter',
-           'IoUMeter', 'EpochIoUMeter', 'BatchIoUMeter',
+           'IoUMeter', 'EpochIoUMeter', 'BatchIoUMeter', 'FixSizeIoUMeter',
            'SemSegVisualizer']

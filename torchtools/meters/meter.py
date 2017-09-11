@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-14 21:17
-# Last modified: 2017-09-11 15:24
+# Last modified: 2017-09-11 15:37
 # Filename: meter.py
 # Description:
 import numpy as np
@@ -100,6 +100,8 @@ class BatchAverageMeter(BatchResetMixin, AverageMeter):
 
 
 class FixSizeAverageMeter(AverageMeter):
+    reset_mode = BATCH_RESET
+
     def __init__(self, name, meter_mode, fix_size, *args, **kwargs):
         self.fix_size = fix_size
         super(FixSizeAverageMeter, self).__init__(name, meter_mode, *args,
