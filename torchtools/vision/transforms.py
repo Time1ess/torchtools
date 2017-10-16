@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-08 19:25
-# Last modified: 2017-10-16 19:25
+# Last modified: 2017-10-16 19:27
 # Filename: transforms.py
 # Description:
 import random
@@ -11,17 +11,16 @@ import os
 import numbers
 import sys
 
-
-if sys.version_info.major == 2:
-    from collections import Iterable
-else:
-    from typing import Iterable
-
 import numpy as np
 import torch
 
 from PIL import ImageOps, Image
 from torchvision.transforms import ToTensor as _ToTensor
+
+if sys.version_info.major == 2:
+    from collections import Iterable
+else:
+    from typing import Iterable
 
 
 class PairRandomCrop(object):
