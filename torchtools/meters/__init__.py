@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-14 21:20
-# Last modified: 2017-10-16 17:39
+# Last modified: 2017-10-16 18:58
 # Filename: __init__.py
 # Description:
 from .meter import Meter
@@ -19,4 +19,4 @@ __all__ = ['Meter',
            'TimeMeter',
            'IoUMeter', 'EpochIoUMeter', 'BatchIoUMeter', 'FixSizeIoUMeter',
            'SemSegVisualizer',
-           'AccuracyMeter', 'BatchAverageMeter', 'EpochAccuracyMeter']
+           'AccuracyMeter', 'BatchAccuracyMeter', 'EpochAccuracyMeter']
