@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-14 21:18
-# Last modified: 2017-09-11 15:30
+# Last modified: 2017-10-16 17:12
 # Filename: lossmeter.py
 # Description:
 from .meter import EpochAverageMeter, BatchAverageMeter, SCALAR_METER
@@ -26,7 +26,7 @@ class LossMeter(AverageMeter):
             return
         val = state.get(self.loss_type, None)
         if val is not None:
-            self.add(state[self.name].data[0])
+            self.add(state[self.loss_type].data[0])
 
 
 class EpochLossMeter(EpochAverageMeter, LossMeter):

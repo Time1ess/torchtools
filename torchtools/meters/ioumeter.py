@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-09-07 21:22
-# Last modified: 2017-09-11 15:37
+# Last modified: 2017-10-16 17:21
 # Filename: ioumeter.py
 # Description:
 import numpy as np
@@ -44,7 +44,7 @@ class IoUMeter(AverageMeter):
     @property
     def value(self):
         value = super(IoUMeter, self).value
-        return value * 100
+        return value
 
 
 class EpochIoUMeter(EpochAverageMeter, IoUMeter):

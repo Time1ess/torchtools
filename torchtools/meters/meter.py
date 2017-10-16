@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-14 21:17
-# Last modified: 2017-09-11 15:37
+# Last modified: 2017-10-16 17:21
 # Filename: meter.py
 # Description:
 import numpy as np
@@ -29,9 +29,10 @@ class Meter(Hook):
     reset_mode = NO_RESET
     meter_type = BASE_METER
 
-    def __init__(self, name, meter_mode, *args, **kwargs):
+    def __init__(self, name, meter_mode, scaling=1, *args, **kwargs):
         self.name = name
         self.meter_mode = meter_mode
+        self.scaling = scaling
         super(Meter, self).__init__(*args, **kwargs)
         self.reset()
 
@@ -88,7 +89,7 @@ class AverageMeter(Meter):
     @property
     def value(self):
         self.calculate()
-        return self.mean
+        return self.mean * self.scaling
 
 
 class EpochAverageMeter(EpochResetMixin, AverageMeter):

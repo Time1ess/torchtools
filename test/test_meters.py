@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-15 14:21
-# Last modified: 2017-09-11 15:44
+# Last modified: 2017-10-16 18:39
 # Filename: test_meters.py
 # Description:
 import time
@@ -16,6 +16,7 @@ from torch.autograd import Variable
 from torchtools.meters import TimeMeter, IoUMeter, FixSizeIoUMeter
 from torchtools.meters import BatchLossMeter, EpochLossMeter, FixSizeLossMeter
 from torchtools.meters import SemSegVisualizer
+from torchtools.meters import EpochAccuracyMeter, BatchAccuracyMeter
 from torchtools.exceptions import MeterNoValueError
 
 from helpers import ValueObject
@@ -27,7 +28,7 @@ class TestEpochLossMeter(unittest.TestCase):
 
     def test_add(self):
         meter = self.meter
-        self.assertIs(meter.value, np.nan)
+        self.assertTrue(np.isnan(meter.value))
 
         trainer = None
         state = {}
@@ -49,7 +50,7 @@ class TestFixSizeLossMeter(unittest.TestCase):
 
     def test_add(self):
         meter = self.meter
-        self.assertIs(meter.value, np.nan)
+        self.assertTrue(np.isnan(meter.value))
 
         trainer = None
         state = {}
@@ -79,7 +80,7 @@ class TestBatchLossMeter(unittest.TestCase):
 
     def test_add(self):
         meter = self.meter
-        self.assertIs(meter.value, np.nan)
+        self.assertTrue(np.isnan(meter.value))
 
         trainer = None
         state = {}
@@ -123,7 +124,7 @@ class TestIoUMeter(unittest.TestCase):
         self.num_classes = 10
         self.m = 3
         self.h = self.w = 10
-        self.meter = IoUMeter('IoU', 'validate', self.num_classes)
+        self.meter = IoUMeter('IoU', 'validate', self.num_classes, 100)
 
     def test_iou(self):
         num_classes, m, h, w = self.num_classes, self.m, self.h, self.w
@@ -141,7 +142,7 @@ class TestFixSizeIoUMeter(unittest.TestCase):
         self.num_classes = 10
         self.m = 3
         self.h = self.w = 10
-        self.meter = FixSizeIoUMeter('IoU', 'validate', 3, self.num_classes)
+        self.meter = FixSizeIoUMeter('IoU', 'validate', 3, self.num_classes, 100)
 
     def test_iou(self):
         num_classes, m, h, w = self.num_classes, self.m, self.h, self.w
@@ -193,6 +194,27 @@ class TestSemSegVisualizer(unittest.TestCase):
         self.assertEqual(meter.fpi, 2)
         self.assertEqual(meter.step, 1)
         self.assertEqual(meter.value.dim(), 3)
+
+
+class TestEpochAccuracyMeter(unittest.TestCase):
+    def setUp(self):
+        self.meter = BatchAccuracyMeter('acc', 'train')
+
+    def test_add(self):
+        meter = self.meter
+        self.assertEqual(meter.value, 0)
+
+        trainer = None
+        state = {}
+        state['mode'] = 'train'
+        self.assertAlmostEqual(meter.value, 0)
+
+        meter.on_batch_start(trainer, state)
+        state['output'] = Variable(torch.from_numpy(
+            np.arange(16).reshape(4, 4)))
+        state['target'] = torch.from_numpy(np.array([[3], [7], [11], [15]]))
+        meter.on_forward_end(trainer, state)
+        self.assertAlmostEqual(meter.value, 0.99999999)
 
 
 if __name__ == '__main__':
