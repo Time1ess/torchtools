@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-14 21:33
-# Last modified: 2017-09-07 17:25
+# Last modified: 2017-10-17 21:20
 # Filename: explrscheduler.py
 # Description:
 from .lrscheduler import LRScheduler
@@ -19,7 +19,7 @@ class ExpLRScheduler(LRScheduler):
         self.max_iters = len(trainer.train_data_loader) * state['max_epoch']
 
     def on_batch_end(self, trainer, state):
-        if state['mode'] == 'validate':
+        if state['mode'] != 'train':
             return
         iters = state['iters']
         optimizer = state['optimizer']

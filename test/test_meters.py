@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-15 14:21
-# Last modified: 2017-10-16 18:58
+# Last modified: 2017-10-18 17:02
 # Filename: test_meters.py
 # Description:
 import time
@@ -213,7 +213,9 @@ class TestBatchAccuracyMeter(unittest.TestCase):
         meter.on_batch_start(trainer, state)
         state['output'] = Variable(torch.from_numpy(
             np.arange(16).reshape(4, 4)))
-        state['target'] = torch.from_numpy(np.array([[3], [7], [11], [15]]))
+        target = np.zeros((4, 4))
+        target[:, 3] = 1
+        state['target'] = torch.from_numpy(target)
         meter.on_forward_end(trainer, state)
         self.assertAlmostEqual(meter.value, 0.99999999)
 
@@ -234,7 +236,9 @@ class TestEpochAccuracyMeter(unittest.TestCase):
         meter.on_batch_start(trainer, state)
         state['output'] = Variable(torch.from_numpy(
             np.arange(16).reshape(4, 4)))
-        state['target'] = torch.from_numpy(np.array([[3], [7], [11], [15]]))
+        target = np.zeros((4, 4))
+        target[:, 3] = 1
+        state['target'] = torch.from_numpy(target)
         meter.on_forward_end(trainer, state)
         self.assertAlmostEqual(meter.value, 0.99999999)
 

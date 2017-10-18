@@ -3,11 +3,11 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-10-16 17:28
-# Last modified: 2017-10-16 17:55
+# Last modified: 2017-10-18 17:03
 # Filename: accmeter.py
 # Description:
 from .meter import EpochResetMixin, BatchResetMixin, SCALAR_METER
-from .meter import Meter, FixSizeAverageMeter
+from .meter import Meter
 
 
 class AccuracyMeter(Meter):
@@ -21,8 +21,8 @@ class AccuracyMeter(Meter):
     def on_forward_end(self, trainer, state):
         if state['mode'] != self.meter_mode:
             return
-        output = state['output'].max(1)[1]
-        target = state['target']
+        output = state['output'].squeeze().max(1)[1]
+        target = state['target'].squeeze().max(1)[1]
         self.total_cnt += output.size()[0]
         self.correct_cnt += target.eq(output.data.cpu()).sum()
 
@@ -43,5 +43,15 @@ class BatchAccuracyMeter(BatchResetMixin, AccuracyMeter):
     pass
 
 
-class FixSizeAccuracyMeter(FixSizeAverageMeter, AccuracyMeter):
+class ErrorMeter(AccuracyMeter):
+    @property
+    def value(self):
+        return self.scaling * (1 - self.correct_cnt / self.total_cnt)
+
+
+class EpochErrorMeter(EpochResetMixin, ErrorMeter):
+    pass
+
+
+class BatchErrorMeter(BatchResetMixin, ErrorMeter):
     pass

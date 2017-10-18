@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-14 21:18
-# Last modified: 2017-10-16 17:12
+# Last modified: 2017-10-17 21:13
 # Filename: lossmeter.py
 # Description:
 from .meter import EpochAverageMeter, BatchAverageMeter, SCALAR_METER
@@ -16,7 +16,7 @@ class LossMeter(AverageMeter):
     def __init__(self, name, meter_mode, loss_type=None, *args, **kwargs):
         if loss_type is None:
             loss_type = name
-        assert loss_type in ('loss', 'val_loss')
+        assert loss_type in ('loss', 'val_loss', 'test_loss')
         self.values = []
         self.loss_type = loss_type
         super(LossMeter, self).__init__(name, meter_mode, *args, **kwargs)

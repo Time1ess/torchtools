@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-08 19:34
-# Last modified: 2017-09-11 12:00
+# Last modified: 2017-10-18 14:15
 # Filename: trainer.py
 # Description:
 import functools
@@ -34,19 +34,24 @@ def trainer_wraps(func):
 
 class ModelTrainer(object):
     hook_entries = [
-        'on_train_start', 'on_epoch_start', 'on_batch_start',
-        'on_forward_end', 'on_batch_end', 'on_epoch_end',
-        'on_train_end', 'on_validate_start', 'on_validate_end',
+        'on_train_start', 'on_train_end',
+        'on_epoch_start', 'on_epoch_end',
+        'on_forward_end', 'on_backward_end',
+        'on_batch_start', 'on_batch_end',
+        'on_validate_start', 'on_validate_end',
+        'on_test_start', 'on_test_end',
         'on_terminated']
     trainer_ended = False
 
     def __init__(self, model, train_data_loader, criterion, optimizer,
-                 val_data_loader=None, use_cuda=True, device_id=None):
+                 val_data_loader=None, test_data_loader=None,
+                 use_cuda=True, device_id=None):
         self.model = model
         self.train_data_loader = train_data_loader
         self.criterion = criterion
         self.optimizer = optimizer
         self.val_data_loader = val_data_loader
+        self.test_data_loader = test_data_loader
         self.device_id = device_id
         self.use_cuda = use_cuda and torch.cuda.is_available()
 
@@ -104,6 +109,7 @@ class ModelTrainer(object):
         # TODO: Maybe there is a better way to call validate after meter reset?
         if name == 'on_epoch_end':
             self.validate()
+            self.test()
         for hook in self.callback_hooks[name]:
             hook(self, state)
 
@@ -148,17 +154,17 @@ class ModelTrainer(object):
             iter_data = tqdm(data_loader, unit=' batches')
             iter_data.set_description('Epoch ' + str(epoch))
             for batch in iter_data:
+                input, target = batch[0], batch[1]
                 state['iters'] += 1
-                if use_cuda:
-                    input = Variable(batch[0].cuda(device_id))
-                    target = Variable(batch[1].cuda(device_id))
-                else:
-                    input = Variable(batch[0])
-                    target = Variable(batch[1])
-
-                state['input'] = batch[0]
-                state['target'] = batch[1]
+                state['input'] = input
+                state['target'] = target
                 self.on_hook('on_batch_start', state)
+
+                if use_cuda:
+                    input = input.cuda(device_id)
+                    target = target.cuda(device_id)
+                input = Variable(input)
+                target = Variable(target)
 
                 def closure():
                     state['optimizer'].zero_grad()
@@ -170,6 +176,7 @@ class ModelTrainer(object):
                     state['loss'] = loss
                     self.on_hook('on_forward_end', state)
                     loss.backward()
+                    self.on_hook('on_backward_end', state)
                     # Free memory
                     state['output'] = None
                     state['loss'] = None
@@ -205,18 +212,19 @@ class ModelTrainer(object):
         }
         self.on_hook('on_validate_start', state)
         iter_data = tqdm(data_loader, unit=' batches')
-        iter_data.set_description('Test')
+        iter_data.set_description('Validate')
         for batch in iter_data:
+            input, target = batch[0], batch[1]
             state['iters'] += 1
-            if use_cuda:
-                input = Variable(batch[0].cuda(device_id), volatile=True)
-                target = Variable(batch[1].cuda(device_id), volatile=True)
-            else:
-                input = Variable(batch[0], volatile=True)
-                target = Variable(batch[1], volatile=True)
-            state['input'] = batch[0]
-            state['target'] = batch[1]
+            state['input'] = input
+            state['target'] = target
             self.on_hook('on_batch_start', state)
+
+            if use_cuda:
+                input = input.cuda(device_id)
+                target = target.cuda(device_id)
+            input = Variable(input, volatile=True)
+            target = Variable(target, volatile=True)
 
             def closure():
                 output = state['model'](input)
@@ -233,4 +241,57 @@ class ModelTrainer(object):
             closure()
             self.on_hook('on_batch_end', state)
         self.on_hook('on_validate_end', state)
+        return state
+
+    def test(self, test_data_loader=None):
+        if test_data_loader is None and self.test_data_loader is None:
+            return {}
+        model = self.model.train(False)
+        if test_data_loader:
+            data_loader = test_data_loader
+        else:
+            data_loader = self.test_data_loader
+        criterion = self.criterion
+        meters = self.meters
+        use_cuda = self.use_cuda
+        device_id = self.device_id
+
+        state = {
+            'model': model,
+            'arch': type(model).__name__,
+            'mode': 'test',
+            'iters': 0,
+            'meters': meters,
+        }
+        self.on_hook('on_test_start', state)
+        iter_data = tqdm(data_loader, unit=' batches')
+        iter_data.set_description('Test')
+        for batch in iter_data:
+            input, target = batch[0], batch[1]
+            state['iters'] += 1
+            state['input'] = input
+            state['target'] = target
+            self.on_hook('on_batch_start', state)
+
+            if use_cuda:
+                input = input.cuda(device_id)
+                target = target.cuda(device_id)
+            input = Variable(input, volatile=True)
+            target = Variable(target, volatile=True)
+
+            def closure():
+                output = state['model'](input)
+                loss = criterion(output, target)
+                iter_data.set_postfix(loss=loss.data[0])
+                state['output'] = output
+                state['test_loss'] = loss
+                self.on_hook('on_forward_end', state)
+                # Free memory
+                state['output'] = None
+                state['test_loss'] = None
+                return loss
+
+            closure()
+            self.on_hook('on_batch_end', state)
+        self.on_hook('on_test_end', state)
         return state
