@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-08 19:34
-# Last modified: 2017-10-18 14:15
+# Last modified: 2017-10-19 19:25
 # Filename: trainer.py
 # Description:
 import functools
@@ -148,6 +148,7 @@ class ModelTrainer(object):
         iter_epoch = trange(max_epoch, initial=state['epochs'], unit='epoch')
         iter_epoch.set_description('Train')
         for epoch in iter_epoch:
+            model.train(True)
             state['epochs'] = epoch + 1
             self.on_hook('on_epoch_start', state)
 
