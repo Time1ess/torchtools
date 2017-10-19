@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-15 12:28
-# Last modified: 2017-10-19 14:54
+# Last modified: 2017-10-19 15:06
 # Filename: test_callbacks.py
 # Description:
 import os
@@ -146,6 +146,7 @@ class TestEpochPolyLRScheduler(unittest.TestCase):
         lrs = [d['lr'] for d in optimizer.param_groups]
         for lr, gt_lr in zip(lrs, gt_lrs):
             self.assertAlmostEqual(lr, gt_lr, 5)
+
 
 class TestEpochExpLRScheduler(unittest.TestCase):
     def test_schedule(self):
