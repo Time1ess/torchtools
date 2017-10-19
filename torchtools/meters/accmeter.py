@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-10-16 17:28
-# Last modified: 2017-10-18 17:03
+# Last modified: 2017-10-19 09:14
 # Filename: accmeter.py
 # Description:
 from .meter import EpochResetMixin, BatchResetMixin, SCALAR_METER
@@ -21,8 +21,8 @@ class AccuracyMeter(Meter):
     def on_forward_end(self, trainer, state):
         if state['mode'] != self.meter_mode:
             return
-        output = state['output'].squeeze().max(1)[1]
-        target = state['target'].squeeze().max(1)[1]
+        output = state['output'].max(1)[1]
+        target = state['target'].max(1)[1]
         self.total_cnt += output.size()[0]
         self.correct_cnt += target.eq(output.data.cpu()).sum()
 

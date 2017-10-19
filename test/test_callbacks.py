@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-15 12:28
-# Last modified: 2017-09-11 12:03
+# Last modified: 2017-10-19 14:54
 # Filename: test_callbacks.py
 # Description:
 import os
@@ -15,7 +15,9 @@ from random import randint
 import torch
 
 from torchtools.callbacks import EarlyStopping, CSVLogger
-from torchtools.callbacks import LRScheduler, ExpLRScheduler, ReduceLROnPlateau
+from torchtools.callbacks import LRScheduler, ReduceLROnPlateau
+from torchtools.callbacks import EpochPolyLRScheduler, BatchPolyLRScheduler
+from torchtools.callbacks import EpochExpLRScheduler, BatchExpLRScheduler
 from torchtools.callbacks import ModelCheckPoint, TensorBoardLogger
 from torchtools.callbacks import EpochPlotLogger, BatchPlotLogger
 
@@ -121,9 +123,83 @@ class TestLRScheduler(unittest.TestCase):
         self.assertListEqual(scheduler.init_lr, [1, 2])
 
 
-class TestExpLRScheduler(unittest.TestCase):
+class TestEpochPolyLRScheduler(unittest.TestCase):
     def test_schedule(self):
-        scheduler = ExpLRScheduler(0.9)
+        scheduler = EpochPolyLRScheduler(0.9)
+        trainer = FakeTrainer()
+        train_data_loader = FakeDatasetLoader()
+        optimizer = FakeOptimizer()
+        trainer.train_data_loader = train_data_loader
+
+        state = {}
+        state['optimizer'] = optimizer
+        state['max_epoch'] = 10
+        state['mode'] = 'train'
+        state['epochs'] = 5
+
+        scheduler.on_train_start(trainer, state)
+        self.assertEqual(scheduler.maximum, 10)
+
+        scheduler.on_batch_end(trainer, state)
+        scheduler.on_epoch_end(trainer, state)
+        gt_lrs = [0.535889, 1.07177]
+        lrs = [d['lr'] for d in optimizer.param_groups]
+        for lr, gt_lr in zip(lrs, gt_lrs):
+            self.assertAlmostEqual(lr, gt_lr, 5)
+
+class TestEpochExpLRScheduler(unittest.TestCase):
+    def test_schedule(self):
+        scheduler = EpochExpLRScheduler(0.99)
+        trainer = FakeTrainer()
+        train_data_loader = FakeDatasetLoader()
+        optimizer = FakeOptimizer()
+        trainer.train_data_loader = train_data_loader
+
+        state = {}
+        state['optimizer'] = optimizer
+        state['max_epoch'] = 10
+        state['mode'] = 'train'
+        state['epochs'] = randint(5, 10)
+
+        scheduler.on_train_start(trainer, state)
+        self.assertEqual(scheduler.maximum, 10)
+
+        scheduler.on_batch_end(trainer, state)
+        scheduler.on_epoch_end(trainer, state)
+        gt_lrs = [0.99 ** state['epochs'], 2 * 0.99 ** state['epochs']]
+        lrs = [d['lr'] for d in optimizer.param_groups]
+        for lr, gt_lr in zip(lrs, gt_lrs):
+            self.assertAlmostEqual(lr, gt_lr, 5)
+
+
+class TestBatchExpLRScheduler(unittest.TestCase):
+    def test_schedule(self):
+        scheduler = BatchExpLRScheduler(0.99)
+        trainer = FakeTrainer()
+        train_data_loader = FakeDatasetLoader()
+        optimizer = FakeOptimizer()
+        trainer.train_data_loader = train_data_loader
+
+        state = {}
+        state['optimizer'] = optimizer
+        state['max_epoch'] = 10
+        state['mode'] = 'train'
+        state['iters'] = randint(5, 10)
+
+        scheduler.on_train_start(trainer, state)
+        self.assertEqual(scheduler.maximum, 100)
+
+        scheduler.on_batch_end(trainer, state)
+        scheduler.on_epoch_end(trainer, state)
+        gt_lrs = [0.99 ** state['iters'], 2 * 0.99 ** state['iters']]
+        lrs = [d['lr'] for d in optimizer.param_groups]
+        for lr, gt_lr in zip(lrs, gt_lrs):
+            self.assertAlmostEqual(lr, gt_lr, 5)
+
+
+class TestBatchPolyLRScheduler(unittest.TestCase):
+    def test_schedule(self):
+        scheduler = BatchPolyLRScheduler(0.9)
         trainer = FakeTrainer()
         train_data_loader = FakeDatasetLoader()
         optimizer = FakeOptimizer()
@@ -136,7 +212,7 @@ class TestExpLRScheduler(unittest.TestCase):
         state['iters'] = 5
 
         scheduler.on_train_start(trainer, state)
-        self.assertEqual(scheduler.max_iters, 10)
+        self.assertEqual(scheduler.maximum, 10)
 
         scheduler.on_batch_end(trainer, state)
         gt_lrs = [0.535889, 1.07177]
