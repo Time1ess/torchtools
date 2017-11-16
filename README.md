@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/Time1ess/torchtools.svg?branch=master)](https://travis-ci.org/Time1ess/torchtools)
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://github.com/Time1ess/torchtools/blob/master/LICENSE)
 
-## Easy Traing, Easy DL.
+## Easy Training, Easy DL.
 
 torchtools is a High-Level training API on top of [PyTorch](http://pytorch.org) with many useful features to simplifiy the traing process for users.
 It was developed with some ideas from [tnt](https://github.com/pytorch/tnt), [Keras](https://github.com/fchollet/keras), and it was designed to enhance the abilities of PyTorch.
