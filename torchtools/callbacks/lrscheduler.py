@@ -119,13 +119,10 @@ class ReduceLROnPlateau(LRScheduler):
             self.patience -= 1
             if self.patience < 0:
                 optimizer = state['optimizer']
-                init_lr = []
                 for idx, d in enumerate(optimizer.param_groups):
-                    d['lr'] = max(self.init_lr[idx] * self.factor, self.min_lr)
-                    init_lr.append(d['lr'])
+                    d['lr'] = max(d['lr'] * self.factor, self.min_lr)
 
                 # Reset
-                self.set_lr(init_lr)  # Reset base learning rate
                 self.cd = self.init_cd
                 self.patience = self.init_patience
                 self.best = meter_value  # Better than this bad value?

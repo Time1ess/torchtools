@@ -109,7 +109,6 @@ class ModelTrainer(object):
         # TODO: Maybe there is a better way to call validate after meter reset?
         if name == 'on_epoch_end':
             self.validate()
-            self.test()
         for hook in self.callback_hooks[name]:
             hook(self, state)
 
@@ -121,7 +120,6 @@ class ModelTrainer(object):
         state['epochs'] = checkpoint['epochs']
         state['iters'] = checkpoint['iters']
 
-    @trainer_wraps
     def train(self, max_epoch, checkpoint=None):
         model = self.model.train(True)
         data_loader = self.train_data_loader
@@ -162,8 +160,8 @@ class ModelTrainer(object):
                 self.on_hook('on_batch_start', state)
 
                 if use_cuda:
-                    input = input.cuda(device_id)
-                    target = target.cuda(device_id)
+                    input = input.cuda(device_id, async=True)
+                    target = target.cuda(device_id, async=True)
                 input = Variable(input)
                 target = Variable(target)
 
@@ -222,8 +220,8 @@ class ModelTrainer(object):
             self.on_hook('on_batch_start', state)
 
             if use_cuda:
-                input = input.cuda(device_id)
-                target = target.cuda(device_id)
+                input = input.cuda(device_id, async=True)
+                target = target.cuda(device_id, async=True)
             input = Variable(input, volatile=True)
             target = Variable(target, volatile=True)
 
@@ -275,8 +273,8 @@ class ModelTrainer(object):
             self.on_hook('on_batch_start', state)
 
             if use_cuda:
-                input = input.cuda(device_id)
-                target = target.cuda(device_id)
+                input = input.cuda(device_id, async=True)
+                target = target.cuda(device_id, async=True)
             input = Variable(input, volatile=True)
             target = Variable(target, volatile=True)
 

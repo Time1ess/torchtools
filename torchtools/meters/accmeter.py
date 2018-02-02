@@ -22,7 +22,9 @@ class AccuracyMeter(Meter):
         if state['mode'] != self.meter_mode:
             return
         output = state['output'].max(1)[1]
-        target = state['target'].max(1)[1]
+        target = state['target']
+        if len(target.size()) != 1:
+            target = target.max(1)[1]
         self.total_cnt += output.size()[0]
         self.correct_cnt += target.eq(output.data.cpu()).sum()
 

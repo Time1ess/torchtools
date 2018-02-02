@@ -8,7 +8,7 @@
 # Description:
 from setuptools import setup, find_packages
 
-VERSION = '0.0.1'
+VERSION = '0.0.2'
 DESC = ('A High-Level training API on top of PyTorch with '
         'many useful features')
 DESC_SHORT = 'A High-Level training API on top of PyTorch'

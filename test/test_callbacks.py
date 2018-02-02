@@ -3,7 +3,7 @@
 # Author: David
 # Email: youchen.du@gmail.com
 # Created: 2017-08-15 12:28
-# Last modified: 2017-10-19 15:06
+# Last modified: 2017-10-20 16:49
 # Filename: test_callbacks.py
 # Description:
 import os
@@ -315,7 +315,10 @@ class TestReduceLROnPlateau(unittest.TestCase):
         state['meters']['val_loss'] = ValueObject(5)  # worse result
         reducer.on_epoch_end(trainer, state)
 
-        gt_lrs = [0.1, 0.2]
+        state['meters']['val_loss'] = ValueObject(10)  # worse result
+        reducer.on_epoch_end(trainer, state)
+
+        gt_lrs = [0.01, 0.02]
         lrs = [d['lr'] for d in optimizer.param_groups]
         for lr, gt_lr in zip(lrs, gt_lrs):
             self.assertAlmostEqual(lr, gt_lr, 2)
