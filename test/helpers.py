@@ -1,9 +1,5 @@
 # coding: UTF-8
-from random import randint
-
-import torch
 import torch.nn as nn
-
 
 
 class Net(nn.Module):

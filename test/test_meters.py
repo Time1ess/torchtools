@@ -1,5 +1,4 @@
 # coding: UTF-8
-import time
 import unittest
 
 from random import randint
@@ -11,8 +10,7 @@ from torch.autograd import Variable
 
 from torchtools import TRAIN_MODE
 from torchtools.meters import (
-    AverageMeter, AccuracyMeter, ErrorMeter, LossMeter, TimeMeter)
-from torchtools.exceptions import MeterNoValueError
+    AverageMeter, AccuracyMeter, ErrorMeter, LossMeter)
 
 
 class TestAverageMeter(unittest.TestCase):

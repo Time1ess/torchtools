@@ -1,7 +1,6 @@
 # coding: UTF-8
 import os
 import os.path as osp
-import sys
 import re
 import unittest
 import tempfile
@@ -132,17 +131,17 @@ class TestEarlyStopping(unittest.TestCase):
         early_stopping = EarlyStopping('acc', patience=1)
 
         state = {'meters': {'acc': Mock(value=5)}}
-        ret = early_stopping.on_epoch_end(trainer, state)
+        early_stopping.on_epoch_end(trainer, state)
 
         state = {'meters': {'acc': Mock(value=10)}}
-        ret = early_stopping.on_epoch_end(trainer, state)
+        early_stopping.on_epoch_end(trainer, state)
 
         state['meters']['acc'] = Mock(value=2)
-        ret = early_stopping.on_epoch_end(trainer, state)
+        early_stopping.on_epoch_end(trainer, state)
 
         state['meters']['acc'] = Mock(value=3)
         with self.assertRaises(EarlyStoppingError):
-            ret = early_stopping.on_epoch_end(trainer, state)
+            early_stopping.on_epoch_end(trainer, state)
 
 
 class TestLambdaLR(unittest.TestCase):
@@ -163,7 +162,6 @@ class TestStepLR(unittest.TestCase):
     def test_step(self):
         net = Net()
         optimizer = optim.SGD(net.parameters(), lr=1)
-        random_lr = random()
         scheduler = StepLR(optimizer, 2)
         state = {}
         state['optimizer'] = optimizer
@@ -179,7 +177,6 @@ class TestMultiStepLR(unittest.TestCase):
     def test_step(self):
         net = Net()
         optimizer = optim.SGD(net.parameters(), lr=1)
-        random_lr = random()
         scheduler = MultiStepLR(optimizer, milestones=[30, 80], gamma=0.1)
         state = {}
         state['optimizer'] = optimizer
@@ -200,7 +197,6 @@ class TestExponentialLR(unittest.TestCase):
     def test_step(self):
         net = Net()
         optimizer = optim.SGD(net.parameters(), lr=1)
-        random_lr = random()
         scheduler = ExponentialLR(optimizer, 0.5)
         state = {}
         state['optimizer'] = optimizer
