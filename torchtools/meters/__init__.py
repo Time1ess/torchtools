@@ -1,24 +1,20 @@
-#!/usr/bin/env python3
 # coding: UTF-8
-# Author: David
-# Email: youchen.du@gmail.com
-# Created: 2017-08-14 21:20
-# Last modified: 2017-10-17 20:43
-# Filename: __init__.py
-# Description:
-from .meter import Meter
-from .lossmeter import EpochLossMeter, BatchLossMeter, FixSizeLossMeter
+from .configs import (
+    NO_RESET, BATCH_RESET, EPOCH_RESET,
+    NONE_METER, SCALAR_METER, TEXT_METER, IMAGE_METER, HIST_METER,
+    GRAPH_METER, AUDIO_METER)
+from .meter import Meter, EpochMeter, AverageMeter
+from .accmeter import AccuracyMeter, ErrorMeter
+from .lossmeter import LossMeter
 from .timemeter import TimeMeter
-from .ioumeter import IoUMeter, EpochIoUMeter, BatchIoUMeter, FixSizeIoUMeter
-from .semanticmeter import SemSegVisualizer
-from .accmeter import AccuracyMeter, BatchAccuracyMeter, EpochAccuracyMeter
-from .accmeter import ErrorMeter, EpochErrorMeter, BatchErrorMeter
 
 
-__all__ = ['Meter',
-           'EpochLossMeter', 'BatchLossMeter', 'FixSizeLossMeter',
-           'TimeMeter',
-           'IoUMeter', 'EpochIoUMeter', 'BatchIoUMeter', 'FixSizeIoUMeter',
-           'SemSegVisualizer',
-           'AccuracyMeter', 'BatchAccuracyMeter', 'EpochAccuracyMeter',
-           'ErrorMeter', 'EpochErrorMeter', 'BatchErrorMeter']
+__all__ = [
+    'NO_RESET', 'BATCH_RESET', 'EPOCH_RESET',
+    'NONE_METER', 'SCALAR_METER', 'TEXT_METER', 'IMAGE_METER', 'HIST_METER',
+    'GRAPH_METER', 'AUDIO_METER',
+    'Meter', 'EpochMeter', 'AverageMeter',
+    'AccuracyMeter', 'ErrorMeter',
+    'LossMeter',
+    'TimeMeter',
+]

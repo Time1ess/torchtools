@@ -1,0 +1,11 @@
+NO_RESET = 0b0
+BATCH_RESET = 0b1
+EPOCH_RESET = 0b10
+
+NONE_METER = 'none'
+SCALAR_METER = 'scalar'
+TEXT_METER = 'text'
+IMAGE_METER = 'image'
+HIST_METER = 'hist'
+GRAPH_METER = 'graph'
+AUDIO_METER = 'audio'

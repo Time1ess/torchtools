@@ -1,40 +1,31 @@
-#!/usr/local/bin/python3
 # coding: UTF-8
-# Author: David
-# Email: youchen.du@gmail.com
-# Created: 2017-08-14 21:17
-# Last modified: 2017-10-16 17:21
-# Filename: meter.py
-# Description:
 import numpy as np
 
-from collections import deque
-
-from ..callbacks import Hook
-
-NO_RESET = 0b0
-BATCH_RESET = 0b1
-EPOCH_RESET = 0b10
-
-BASE_METER = 'none'
-SCALAR_METER = 'scalar'
-TEXT_METER = 'text'
-IMAGE_METER = 'image'
-HIST_METER = 'hist'
-GRAPH_METER = 'graph'
-AUDIO_METER = 'audio'
+from torchtools import TRAIN_MODE, VALIDATE_MODE, TEST_MODE
+from torchtools.callbacks import Hook
+from torchtools.meters import NO_RESET, NONE_METER, EPOCH_RESET, SCALAR_METER
 
 
 class Meter(Hook):
     reset_mode = NO_RESET
-    meter_type = BASE_METER
+    meter_type = NONE_METER
+    mode = None
 
-    def __init__(self, name, meter_mode, scaling=1, *args, **kwargs):
-        self.name = name
-        self.meter_mode = meter_mode
-        self.scaling = scaling
+    def __init__(self, name, alias=None, scaling=1, *args, **kwargs):
         super(Meter, self).__init__(*args, **kwargs)
+        self._check_and_set_mode(name)
+        self.name = name
+        self.alias = name if alias is None else alias
+        self.scaling = scaling
         self.reset()
+
+    def _check_and_set_mode(self, name):
+        if name.startswith('val'):
+            self.mode = VALIDATE_MODE
+        elif name.startswith('test'):
+            self.mode = TEST_MODE
+        else:
+            self.mode = TRAIN_MODE
 
     def reset(self):
         pass
@@ -43,37 +34,30 @@ class Meter(Hook):
     def value(self):
         pass
 
-    @property
-    def can_call(self):
-        return True
-
     def add(self):
         pass
 
 
-class EpochResetMixin(Meter):
+class EpochResetMixin(object):
     reset_mode = EPOCH_RESET
 
     def on_epoch_start(self, trainer, state):
         self.reset()
 
 
-class BatchResetMixin(Meter):
-    reset_mode = BATCH_RESET
-
-    def on_batch_start(self, trainer, state):
-        self.reset()
+class EpochMeter(EpochResetMixin, Meter):
+    pass
 
 
-class AverageMeter(Meter):
+class AverageMeter(EpochMeter):
     meter_type = SCALAR_METER
 
     def __init__(self, *args, **kwargs):
-        self.values = deque()
+        self.values = []
         super(AverageMeter, self).__init__(*args, **kwargs)
 
     def reset(self):
-        self.values.clear()
+        self.values = []
 
     def add(self, value):
         self.values.append(value)
@@ -90,25 +74,3 @@ class AverageMeter(Meter):
     def value(self):
         self.calculate()
         return self.mean * self.scaling
-
-
-class EpochAverageMeter(EpochResetMixin, AverageMeter):
-    pass
-
-
-class BatchAverageMeter(BatchResetMixin, AverageMeter):
-    pass
-
-
-class FixSizeAverageMeter(AverageMeter):
-    reset_mode = BATCH_RESET
-
-    def __init__(self, name, meter_mode, fix_size, *args, **kwargs):
-        self.fix_size = fix_size
-        super(FixSizeAverageMeter, self).__init__(name, meter_mode, *args,
-                                                  **kwargs)
-
-    def add(self, value):
-        if len(self.values) == self.fix_size:
-            self.values.popleft()
-        super(FixSizeAverageMeter, self).add(value)

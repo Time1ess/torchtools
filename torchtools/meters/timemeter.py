@@ -1,25 +1,18 @@
-#!/usr/local/bin/python3
 # coding: UTF-8
-# Author: David
-# Email: youchen.du@gmail.com
-# Created: 2017-08-14 21:19
-# Last modified: 2017-09-11 14:30
-# Filename: timemeter.py
-# Description:
-from datetime import datetime
+from time import time
 
-from .meter import EpochResetMixin, SCALAR_METER
+from torchtools.meters import EpochMeter, SCALAR_METER
 
 
-class TimeMeter(EpochResetMixin):
+class TimeMeter(EpochMeter):
     meter_type = SCALAR_METER
 
     def on_epoch_start(self, trainer, state):
-        self.tick = datetime.now()
+        self.tick = time()
 
     def on_epoch_end(self, trainer, state):
-        self.tock = datetime.now()
+        self.tock = time()
 
     @property
     def value(self):
-        return (self.tock - self.tick).total_seconds()
+        return self.scaling * (self.tock - self.tick)

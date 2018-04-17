@@ -8,25 +8,23 @@
 # Description:
 import numpy as np
 
-from .meter import AverageMeter, EpochAverageMeter, BatchAverageMeter
-from .meter import FixSizeAverageMeter, SCALAR_METER
-
-from .utils import fast_hist
+from torchtools.meters import AverageMeter, SCALAR_METER
+from torchtools.meters.vision.utils import fast_hist
 
 
 class IoUMeter(AverageMeter):
     meter_type = SCALAR_METER
 
-    def __init__(self, name, meter_mode, num_classes, *args, **kwargs):
+    def __init__(self, name, num_classes, *args, **kwargs):
+        super(IoUMeter, self).__init__(name, *args, **kwargs)
         self.num_classes = num_classes
-        super(IoUMeter, self).__init__(name, meter_mode, *args, **kwargs)
 
     def on_forward_end(self, trainer, state):
-        if state['mode'] != self.meter_mode:
+        if state['mode'] != self.mode:
             return
-        output = state['output']
-        prediction = output.data.max(1)[1].cpu().numpy()[:, :, :]
-        ground_truth = state['target'].cpu().numpy()  # N x H x W
+        pred = state['output'].max(1)[1].data.cpu()
+        prediction = pred.numpy()[:, :, :]
+        ground_truth = state['target'].data.cpu().numpy()  # N x H x W
         val = 0
         n_class = self.num_classes
         for p, g in zip(prediction, ground_truth):  # For each sample, H x W
@@ -40,20 +38,3 @@ class IoUMeter(AverageMeter):
                 iou = 0
             val += iou
         self.add(val / len(ground_truth))
-
-    @property
-    def value(self):
-        value = super(IoUMeter, self).value
-        return value
-
-
-class EpochIoUMeter(EpochAverageMeter, IoUMeter):
-    pass
-
-
-class BatchIoUMeter(BatchAverageMeter, IoUMeter):
-    pass
-
-
-class FixSizeIoUMeter(FixSizeAverageMeter, IoUMeter):
-    pass

@@ -1,59 +1,37 @@
-#!/usr/bin/env python3
 # coding: UTF-8
-# Author: David
-# Email: youchen.du@gmail.com
-# Created: 2017-10-16 17:28
-# Last modified: 2017-10-19 09:14
-# Filename: accmeter.py
-# Description:
-from .meter import EpochResetMixin, BatchResetMixin, SCALAR_METER
-from .meter import Meter
+from torchtools.meters import EpochMeter, SCALAR_METER
 
 
-class AccuracyMeter(Meter):
+class AccuracyMeter(EpochMeter):
     meter_type = SCALAR_METER
 
-    def __init__(self, name, meter_mode, *args, **kwargs):
-        self.total_cnt = 1e-9
+    def __init__(self, name, *args, **kwargs):
+        super(AccuracyMeter, self).__init__(name, *args, **kwargs)
+        self.total_cnt = 0
         self.correct_cnt = 0
-        super(AccuracyMeter, self).__init__(name, meter_mode, *args, **kwargs)
 
     def on_forward_end(self, trainer, state):
-        if state['mode'] != self.meter_mode:
+        if state['mode'] != self.mode:
             return
-        output = state['output'].max(1)[1]
-        target = state['target']
+        pred = state['output'].max(1)[1].data.cpu()
+        target = state['target'].data.cpu()
         if len(target.size()) != 1:
             target = target.max(1)[1]
-        self.total_cnt += output.size()[0]
-        self.correct_cnt += target.eq(output.data.cpu()).sum()
+        self.total_cnt += pred.size()[0]
+        self.correct_cnt += target.eq(pred).sum()
 
     def reset(self):
-        self.total_cnt = 1e-9
+        self.total_cnt = 0
         self.correct_cnt = 0
 
     @property
     def value(self):
-        return self.correct_cnt / self.total_cnt * self.scaling
-
-
-class EpochAccuracyMeter(EpochResetMixin, AccuracyMeter):
-    pass
-
-
-class BatchAccuracyMeter(BatchResetMixin, AccuracyMeter):
-    pass
+        if self.total_cnt == 0:
+            return 0
+        return self.scaling * self.correct_cnt / self.total_cnt
 
 
 class ErrorMeter(AccuracyMeter):
     @property
     def value(self):
         return self.scaling * (1 - self.correct_cnt / self.total_cnt)
-
-
-class EpochErrorMeter(EpochResetMixin, ErrorMeter):
-    pass
-
-
-class BatchErrorMeter(BatchResetMixin, ErrorMeter):
-    pass
