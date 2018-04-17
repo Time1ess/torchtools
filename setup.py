@@ -1,14 +1,7 @@
-#!/usr/local/bin/python3
 # coding: UTF-8
-# Author: David
-# Email: youchen.du@gmail.com
-# Created: 2017-08-14 21:43
-# Last modified: 2017-08-15 10:10
-# Filename: setup.py
-# Description:
 from setuptools import setup, find_packages
 
-VERSION = '0.0.2'
+VERSION = '0.1.0'
 DESC = ('A High-Level training API on top of PyTorch with '
         'many useful features')
 DESC_SHORT = 'A High-Level training API on top of PyTorch'
@@ -29,7 +22,7 @@ setup_info = dict(
         'Pillow',
         'tqdm',
         'torch',
-        'visdom'])
+        'tensorboardX'])
 
 
 setup(**setup_info)

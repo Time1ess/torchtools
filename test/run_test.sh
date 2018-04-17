@@ -6,4 +6,4 @@ pushd "$(dirname "$0")"
 
 $PYTHON test_callbacks.py
 $PYTHON test_meters.py
-$PYTHON test_transforms.py
+#$PYTHON test_transforms.py

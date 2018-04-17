@@ -1,80 +1,77 @@
-#!python3
 # coding: UTF-8
-# Author: David
-# Email: youchen.du@gmail.com
-# Created: 2017-08-15 12:28
-# Last modified: 2017-10-20 16:49
-# Filename: test_callbacks.py
-# Description:
 import os
+import os.path as osp
 import sys
+import re
 import unittest
 import tempfile
-from random import randint
+
+from random import randint, random
+from unittest.mock import Mock, patch
 
 import torch
+import torch.optim as optim
 
-from torchtools.callbacks import EarlyStopping, CSVLogger
-from torchtools.callbacks import LRScheduler, ReduceLROnPlateau
-from torchtools.callbacks import EpochPolyLRScheduler, BatchPolyLRScheduler
-from torchtools.callbacks import EpochExpLRScheduler, BatchExpLRScheduler
-from torchtools.callbacks import ModelCheckPoint, TensorBoardLogger
-from torchtools.callbacks import EpochPlotLogger, BatchPlotLogger
+from torchtools import VALIDATE_MODE
+from torchtools.meters import EPOCH_RESET, SCALAR_METER
+from torchtools.exceptions import EarlyStoppingError
+from torchtools.callbacks import (
+    ModelCheckPoint, CSVLogger, EarlyStopping,
+    LambdaLR, StepLR, MultiStepLR, ExponentialLR, ReduceLROnPlateau,
+    TensorBoardLogger)
 
-from helpers import FakeModel, FakeDatasetLoader
-from helpers import FakeOptimizer, FakeTrainer
-from helpers import ValueObject
+from helpers import Net
 
 
-class TestEarlyStopping(unittest.TestCase):
-    def test_loss(self):
-        stdout, sys.stdout = sys.stdout, None
-        trainer = FakeTrainer()
-        early_stopping = EarlyStopping('val_loss', 1)
+class TestModelCheckPoint(unittest.TestCase):
+    def test_save_and_load(self):
+        tempdir = tempfile.gettempdir()
+        checkpoint = ModelCheckPoint(tempdir, monitor='val_loss')
+        trainer = Mock()
 
-        state = {'meters': {'val_loss': ValueObject(5)}}
-        ret = early_stopping.on_epoch_end(trainer, state)
-        self.assertIs(ret, None)
+        state = {}
+        state['meters'] = {}
+        state['meters']['loss'] = Mock(value=5)
+        state['meters']['val_loss'] = Mock(value=5)
+        state['arch'] = 'Fake'
+        state['epochs'] = randint(0, 100)
+        state['iters'] = randint(0, 100) * 100
+        net = Net()
+        state['model'] = net
+        state['optimizer'] = optim.SGD(net.parameters(), lr=1e-3)
 
-        state = {'meters': {'val_loss': ValueObject(2)}}
-        ret = early_stopping.on_epoch_end(trainer, state)
-        self.assertIs(ret, None)
+        checkpoint.on_epoch_end(trainer, state)
 
-        state['meters']['val_loss'] = ValueObject(10)
-        ret = early_stopping.on_epoch_end(trainer, state)
-        self.assertEqual(ret, 0)
-        sys.stdout = stdout
+        path = os.path.join(
+            tempdir,
+            'best_{arch}_{epochs:05d}_{val_loss:.2f}.pt'.format(**state))
 
-    def test_acc(self):
-        stdout, sys.stdout = sys.stdout, None
-        trainer = FakeTrainer()
-        early_stopping = EarlyStopping('acc', 1)
+        self.assertTrue(os.path.exists(path))
 
-        state = {'meters': {'acc': ValueObject(5)}}
-        ret = early_stopping.on_epoch_end(trainer, state)
-        self.assertIs(ret, None)
-
-        state = {'meters': {'acc': ValueObject(10)}}
-        ret = early_stopping.on_epoch_end(trainer, state)
-        self.assertIs(ret, None)
-
-        state['meters']['acc'] = ValueObject(2)
-        ret = early_stopping.on_epoch_end(trainer, state)
-        self.assertEqual(ret, 0)
-        sys.stdout = stdout
+        loaded_state = torch.load(path)
+        net = Net()
+        net.load_state_dict(loaded_state['model_state_dict'])
+        for param1, param2 in zip(
+                state['model'].state_dict().values(),
+                net.state_dict().values()):
+            self.assertTrue(torch.equal(param1, param2))
+        optimizer = optim.SGD(net.parameters(), lr=1e-3)
+        optimizer.load_state_dict(loaded_state['optimizer_state_dict'])
+        self.assertEqual(state['epochs'], loaded_state['epochs'])
+        self.assertEqual(state['iters'], loaded_state['iters'])
 
 
 class TestCSVLogger(unittest.TestCase):
-    def test_wrong_init(self):
-        with self.assertRaises(ValueError):
+    def test_wrong_keys(self):
+        with self.assertRaises(AssertionError):
             CSVLogger(keys=5)
 
     def test_wrong_key(self):
-        directory = tempfile.gettempdir()
+        log_dir = tempfile.gettempdir()
         csv_logger = CSVLogger(
-            directory=directory,
+            log_dir=log_dir,
             keys=['loss'])
-        trainer = FakeTrainer()
+        trainer = Mock()
 
         state = {}
 
@@ -87,263 +84,171 @@ class TestCSVLogger(unittest.TestCase):
         csv_logger.on_train_end(trainer, state)
 
     def test_write_log(self):
-        directory = tempfile.gettempdir()
+        log_dir = tempfile.gettempdir()
         csv_logger = CSVLogger(
-            directory=directory,
+            log_dir=log_dir,
             keys=['loss'])
-        trainer = FakeTrainer()
+        trainer = Mock()
 
         state = {'meters': {}}
 
         ret = csv_logger.on_train_start(trainer, state)
         self.assertIs(ret, None)
 
-        state['meters']['loss'] = ValueObject(5)
+        loss = Mock(value=randint(0, 100))
+        state['meters']['loss'] = loss
         ret = csv_logger.on_epoch_end(trainer, state)
-        self.assertIs(ret, None)
-
+        fpath = osp.join(log_dir, 'training_log.csv')
+        with open(fpath, 'r') as f:
+            data = ''.join(f.readlines())
+        pat = re.compile(
+            r'timestamp,loss\n\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}\.\d+,')
+        self.assertIsNot(pat.match(data), None)
         csv_logger.on_train_end(trainer, state)
 
 
-class TestLRScheduler(unittest.TestCase):
-    def test_init(self):
-        scheduler = LRScheduler()
-        trainer = FakeTrainer()
-        train_data_loader = FakeDatasetLoader()
-        optimizer = FakeOptimizer()
-        trainer.train_data_loader = train_data_loader
+class TestEarlyStopping(unittest.TestCase):
+    def test_loss(self):
+        trainer = Mock()
+        early_stopping = EarlyStopping('val_loss', patience=1)
 
+        state = {'meters': {'val_loss': Mock(value=10)}}
+        ret = early_stopping.on_epoch_end(trainer, state)
+        self.assertIs(ret, None)
+
+        state = {'meters': {'val_loss': Mock(value=2)}}
+        ret = early_stopping.on_epoch_end(trainer, state)
+        self.assertIs(ret, None)
+
+        state['meters']['val_loss'] = Mock(value=5)
+        ret = early_stopping.on_epoch_end(trainer, state)
+
+        state['meters']['val_loss'] = Mock(value=3)
+        with self.assertRaises(EarlyStoppingError):
+            ret = early_stopping.on_epoch_end(trainer, state)
+
+    def test_acc(self):
+        trainer = Mock()
+        early_stopping = EarlyStopping('acc', patience=1)
+
+        state = {'meters': {'acc': Mock(value=5)}}
+        ret = early_stopping.on_epoch_end(trainer, state)
+
+        state = {'meters': {'acc': Mock(value=10)}}
+        ret = early_stopping.on_epoch_end(trainer, state)
+
+        state['meters']['acc'] = Mock(value=2)
+        ret = early_stopping.on_epoch_end(trainer, state)
+
+        state['meters']['acc'] = Mock(value=3)
+        with self.assertRaises(EarlyStoppingError):
+            ret = early_stopping.on_epoch_end(trainer, state)
+
+
+class TestLambdaLR(unittest.TestCase):
+    def test_step(self):
+        net = Net()
+        optimizer = optim.SGD(net.parameters(), lr=1)
+        random_lr = random()
+        scheduler = LambdaLR(optimizer, lambda epoch: random_lr)
         state = {}
         state['optimizer'] = optimizer
-        state['max_epoch'] = 1
-        state['mode'] = 'train'
-        state['iters'] = 5
 
-        scheduler.on_train_start(trainer, state)
-        self.assertListEqual(scheduler.init_lr, [1, 2])
+        scheduler.on_epoch_start(None, state)
+        for param in optimizer.param_groups:
+            self.assertEqual(param['lr'], random_lr)
 
 
-class TestEpochPolyLRScheduler(unittest.TestCase):
-    def test_schedule(self):
-        scheduler = EpochPolyLRScheduler(0.9)
-        trainer = FakeTrainer()
-        train_data_loader = FakeDatasetLoader()
-        optimizer = FakeOptimizer()
-        trainer.train_data_loader = train_data_loader
-
+class TestStepLR(unittest.TestCase):
+    def test_step(self):
+        net = Net()
+        optimizer = optim.SGD(net.parameters(), lr=1)
+        random_lr = random()
+        scheduler = StepLR(optimizer, 2)
         state = {}
         state['optimizer'] = optimizer
-        state['max_epoch'] = 10
-        state['mode'] = 'train'
-        state['epochs'] = 5
 
-        scheduler.on_train_start(trainer, state)
-        self.assertEqual(scheduler.maximum, 10)
-
-        scheduler.on_batch_end(trainer, state)
-        scheduler.on_epoch_end(trainer, state)
-        gt_lrs = [0.535889, 1.07177]
-        lrs = [d['lr'] for d in optimizer.param_groups]
-        for lr, gt_lr in zip(lrs, gt_lrs):
-            self.assertAlmostEqual(lr, gt_lr, 5)
+        scheduler.on_epoch_start(None, state)
+        scheduler.on_epoch_start(None, state)
+        scheduler.on_epoch_start(None, state)
+        for param in optimizer.param_groups:
+            self.assertEqual(param['lr'], 0.1)
 
 
-class TestEpochExpLRScheduler(unittest.TestCase):
-    def test_schedule(self):
-        scheduler = EpochExpLRScheduler(0.99)
-        trainer = FakeTrainer()
-        train_data_loader = FakeDatasetLoader()
-        optimizer = FakeOptimizer()
-        trainer.train_data_loader = train_data_loader
-
+class TestMultiStepLR(unittest.TestCase):
+    def test_step(self):
+        net = Net()
+        optimizer = optim.SGD(net.parameters(), lr=1)
+        random_lr = random()
+        scheduler = MultiStepLR(optimizer, milestones=[30, 80], gamma=0.1)
         state = {}
         state['optimizer'] = optimizer
-        state['max_epoch'] = 10
-        state['mode'] = 'train'
-        state['epochs'] = randint(5, 10)
 
-        scheduler.on_train_start(trainer, state)
-        self.assertEqual(scheduler.maximum, 10)
-
-        scheduler.on_batch_end(trainer, state)
-        scheduler.on_epoch_end(trainer, state)
-        gt_lrs = [0.99 ** state['epochs'], 2 * 0.99 ** state['epochs']]
-        lrs = [d['lr'] for d in optimizer.param_groups]
-        for lr, gt_lr in zip(lrs, gt_lrs):
-            self.assertAlmostEqual(lr, gt_lr, 5)
+        for epoch in range(100):
+            scheduler.on_epoch_start(None, state)
+            for param in optimizer.param_groups:
+                lr = param['lr']
+                if epoch < 30:
+                    self.assertAlmostEqual(lr, 1)
+                elif epoch < 80:
+                    self.assertAlmostEqual(lr, 0.1)
+                else:
+                    self.assertAlmostEqual(lr, 0.01)
 
 
-class TestBatchExpLRScheduler(unittest.TestCase):
-    def test_schedule(self):
-        scheduler = BatchExpLRScheduler(0.99)
-        trainer = FakeTrainer()
-        train_data_loader = FakeDatasetLoader()
-        optimizer = FakeOptimizer()
-        trainer.train_data_loader = train_data_loader
-
+class TestExponentialLR(unittest.TestCase):
+    def test_step(self):
+        net = Net()
+        optimizer = optim.SGD(net.parameters(), lr=1)
+        random_lr = random()
+        scheduler = ExponentialLR(optimizer, 0.5)
         state = {}
         state['optimizer'] = optimizer
-        state['max_epoch'] = 10
-        state['mode'] = 'train'
-        state['iters'] = randint(5, 10)
 
-        scheduler.on_train_start(trainer, state)
-        self.assertEqual(scheduler.maximum, 100)
-
-        scheduler.on_batch_end(trainer, state)
-        scheduler.on_epoch_end(trainer, state)
-        gt_lrs = [0.99 ** state['iters'], 2 * 0.99 ** state['iters']]
-        lrs = [d['lr'] for d in optimizer.param_groups]
-        for lr, gt_lr in zip(lrs, gt_lrs):
-            self.assertAlmostEqual(lr, gt_lr, 5)
-
-
-class TestBatchPolyLRScheduler(unittest.TestCase):
-    def test_schedule(self):
-        scheduler = BatchPolyLRScheduler(0.9)
-        trainer = FakeTrainer()
-        train_data_loader = FakeDatasetLoader()
-        optimizer = FakeOptimizer()
-        trainer.train_data_loader = train_data_loader
-
-        state = {}
-        state['optimizer'] = optimizer
-        state['max_epoch'] = 1
-        state['mode'] = 'train'
-        state['iters'] = 5
-
-        scheduler.on_train_start(trainer, state)
-        self.assertEqual(scheduler.maximum, 10)
-
-        scheduler.on_batch_end(trainer, state)
-        gt_lrs = [0.535889, 1.07177]
-        lrs = [d['lr'] for d in optimizer.param_groups]
-        for lr, gt_lr in zip(lrs, gt_lrs):
-            self.assertAlmostEqual(lr, gt_lr, 5)
-
-
-class TestModelCheckPoint(unittest.TestCase):
-    def test_save_and_load(self):
-        tempdir = tempfile.gettempdir()
-        checkpoint = ModelCheckPoint(tempdir, monitor='loss',
-                                     save_best_only=True)
-        trainer = FakeTrainer()
-
-        state = {}
-        state['meters'] = {}
-        state['meters']['loss'] = ValueObject(5)
-        state['arch'] = 'Fake'
-        state['epochs'] = randint(0, 100)
-        state['iters'] = randint(0, 100) * 100
-        state['model'] = FakeModel()
-        state['optimizer'] = FakeOptimizer()
-
-        checkpoint.on_epoch_end(trainer, state)
-
-        path = os.path.join(
-            tempdir, 'checkpoint_{}_best.pth.tar'.format(state['arch']))
-        self.assertTrue(os.path.exists(path))
-
-        loaded_state = torch.load(path)
-        self.assertListEqual(state['model'].state_dict(),
-                             loaded_state['model_state_dict'])
-        self.assertListEqual(state['optimizer'].state_dict(),
-                             loaded_state['optimizer_state_dict'])
-        self.assertEqual(state['epochs'], loaded_state['epochs'])
-        self.assertEqual(state['iters'], loaded_state['iters'])
-
-
-class TestPlotLogger(unittest.TestCase):
-    def test_epoch_plot_logger(self):
-        plot_logger = EpochPlotLogger('train', 'loss', 3, 'line')
-
-        trainer = FakeTrainer()
-        state = {}
-        state['meters'] = {}
-        val0, val1 = ValueObject(randint(0, 100)), ValueObject(randint(0, 100))
-        epoch0, epoch1 = randint(0, 100), randint(0, 100)
-        state['meters']['loss'] = val0
-        state['epochs'] = epoch0
-        plot_logger.on_epoch_end(trainer, state)
-        self.assertEqual(dict(plot_logger.data_cache),
-                         {'x': [epoch0], 'y': [val0.value]})
-        state['meters']['loss'] = val1
-        state['epochs'] = epoch1
-        plot_logger.on_epoch_end(trainer, state)
-        self.assertEqual(dict(plot_logger.data_cache),
-                         {'x': [epoch0, epoch1],
-                          'y': [val0.value, val1.value]})
-
-    def test_batch_plot_logger(self):
-        plot_logger = BatchPlotLogger('val', 'val_loss', 10, 'line')
-
-        trainer = FakeTrainer()
-        state = {}
-        state['mode'] = 'val'
-        state['meters'] = {}
-        val0, val1 = ValueObject(randint(0, 100)), ValueObject(randint(0, 100))
-        iters0, iters1 = randint(0, 100), randint(0, 100)
-        state['meters']['val_loss'] = val0
-        state['iters'] = iters0
-        plot_logger.on_batch_end(trainer, state)
-        self.assertEqual(dict(plot_logger.data_cache),
-                         {'x': [iters0], 'y': [val0.value]})
-        state['meters']['val_loss'] = val1
-        state['iters'] = iters1
-        plot_logger.on_batch_end(trainer, state)
-        self.assertEqual(dict(plot_logger.data_cache),
-                         {'x': [iters0, iters1],
-                          'y': [val0.value, val1.value]})
+        scheduler.on_epoch_start(None, state)
+        scheduler.on_epoch_start(None, state)
+        for param in optimizer.param_groups:
+            self.assertEqual(param['lr'], 0.5)
 
 
 class TestReduceLROnPlateau(unittest.TestCase):
-    def test_reduce(self):
-        reducer = ReduceLROnPlateau(patience=0)
-        trainer = FakeTrainer()
-        train_data_loader = FakeDatasetLoader()
-        optimizer = FakeOptimizer()
-        trainer.train_data_loader = train_data_loader
-
+    def test_step(self):
+        net = Net()
+        optimizer = optim.SGD(net.parameters(), lr=1)
+        scheduler = ReduceLROnPlateau(optimizer, 'val_loss', patience=0)
         state = {}
         state['optimizer'] = optimizer
         state['meters'] = {}
-        state['meters']['val_loss'] = ValueObject(1)
 
-        reducer.on_train_start(trainer, state)
-        reducer.on_epoch_end(trainer, state)
+        state['meters']['val_loss'] = Mock(value=5)
+        scheduler.on_epoch_end(None, state)
+        state['meters']['val_loss'] = Mock(value=8)
+        scheduler.on_epoch_end(None, state)
 
-        state['meters']['val_loss'] = ValueObject(5)  # worse result
-        reducer.on_epoch_end(trainer, state)
-
-        state['meters']['val_loss'] = ValueObject(10)  # worse result
-        reducer.on_epoch_end(trainer, state)
-
-        gt_lrs = [0.01, 0.02]
-        lrs = [d['lr'] for d in optimizer.param_groups]
-        for lr, gt_lr in zip(lrs, gt_lrs):
-            self.assertAlmostEqual(lr, gt_lr, 2)
+        for param in optimizer.param_groups:
+            self.assertEqual(param['lr'], 0.1)
 
 
 class TestTensorBoardLogger(unittest.TestCase):
-    def test_log_scalar(self):
-        tb = TensorBoardLogger()
+    @patch('torchtools.callbacks.TensorBoardLogger.log_scalar')
+    def test_log_scalar(self, mocked_log_scalar):
+        log_dir = tempfile.gettempdir()
+        tb = TensorBoardLogger(log_dir)
 
-        trainer = FakeTrainer()
         state = {}
         state['meters'] = {}
-        val0, val1 = ValueObject(randint(0, 100)), ValueObject(randint(0, 100))
-        val0.reset_mode = 0b10
-        val1.reset_mode = 0b10
-        val0.can_call = False
-        val1.can_call = False
+        state['epochs'] = 10
+        state['mode'] = VALIDATE_MODE
+        val_loss_meter = Mock(value=5)
+        val_loss_meter.mode = VALIDATE_MODE
+        val_loss_meter.alias = 'val_loss'
+        val_loss_meter.reset_mode = EPOCH_RESET
+        val_loss_meter.meter_type = SCALAR_METER
+        state['meters']['val_loss'] = val_loss_meter
 
-        epoch0, epoch1 = randint(0, 100), randint(0, 100)
-        state['meters']['loss'] = val0
-        state['epochs'] = epoch0
-        tb.on_epoch_end(trainer, state)
-        state['meters']['loss'] = val1
-        state['epochs'] = epoch1
-        tb.on_epoch_end(trainer, state)
+        tb.on_epoch_end(None, state)
+        mocked_log_scalar.assert_called_with(
+            val_loss_meter.alias, val_loss_meter.value, state['epochs'])
 
 
 if __name__ == '__main__':
