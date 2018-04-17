@@ -14,7 +14,7 @@ class AccuracyMeter(EpochMeter):
         if state['mode'] != self.mode:
             return
         pred = state['output'].max(1)[1].data.cpu()
-        target = state['target'].data.cpu()
+        target = state['target']
         if len(target.size()) != 1:
             target = target.max(1)[1]
         self.total_cnt += pred.size()[0]

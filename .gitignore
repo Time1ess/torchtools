@@ -1,9 +1,10 @@
 build/
 dist/
 tmp/
+runs/
+logs/
 torchtools.egg-info/
 */**/__pycache__
 */**/*.pyc
 .*
 !.travis.yml
-test/logs/

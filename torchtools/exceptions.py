@@ -5,7 +5,7 @@ class TorchToolsException(Exception):
     pass
 
 
-class CallbackTypeError(TorchToolsException):
+class HookTypeError(TorchToolsException):
     pass
 
 

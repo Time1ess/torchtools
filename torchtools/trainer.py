@@ -1,30 +1,14 @@
 # coding: UTF-8
-import functools
-
 import torch
 
 from torch.autograd import Variable
 from tqdm import tqdm, trange
 
 from torchtools import TRAIN_MODE, VALIDATE_MODE, TEST_MODE
-from torchtools.callbacks import Callback
+from torchtools.callbacks import Hook, Callback
 from torchtools.exceptions import (
-    CallbackTypeError, TrainerTerminated)
+    HookTypeError, TrainerTerminated)
 from torchtools.meters import Meter
-
-
-def trainer_wraps(func):
-    @functools.wraps(func)
-    def _wraps(self, *args, **kwargs):
-        try:
-            return func(self, *args, **kwargs)
-        except TrainerTerminated:
-            return None
-        except KeyboardInterrupt:
-            self.terminate(raise_exception=False)
-        except Exception:
-            raise
-    return _wraps
 
 
 class Trainer(object):
@@ -55,48 +39,49 @@ class Trainer(object):
         self.meters = {}
         self.callbacks = []
 
-    def register_callbacks(self, cbs):
-        for cb in cbs:
-            self.register_callback(cb)
+    def register_hooks(self, hooks):
+        for hook in hooks:
+            self.register_hook(hook)
 
-    def register_callback(self, cb):
-        if not isinstance(cb, Callback):
-            raise CallbackTypeError('{} is not a valid callback'.format(cb))
-        cb._callback_check(self)
+    def register_hook(self, hook):
+        if not isinstance(hook, Hook):
+            raise HookTypeError('{} is not a valid hook'.format(hook))
+        if isinstance(hook, Callback):
+            hook._callback_check(self)
 
-        if isinstance(cb, Meter):
+        if isinstance(hook, Meter):
             container = self.meter_hooks
-            self.meters[cb.name] = cb
+            self.meters[hook.name] = hook
         else:
             container = self.callback_hooks
-            self.callbacks.append(cb)
+            self.callbacks.append(hook)
 
         for name in self.hook_entries:
-            entry = getattr(cb, name)
+            entry = getattr(hook, name)
             container[name].append(entry)
 
-    def unregister_callbacks(self, cbs):
-        for cb in cbs:
-            self.unregister_callback(cb)
+    def unregister_hooks(self, hooks):
+        for hook in hooks:
+            self.unregister_hook(hook)
 
-    def unregister_callback(self, cb):
-        if not isinstance(cb, Callback):
-            raise CallbackTypeError('{} is not a valid callback'.format(cb))
+    def unregister_hook(self, hook):
+        if not isinstance(hook, Hook):
+            raise HookTypeError('{} is not a valid hook'.format(hook))
 
-        if isinstance(cb, Meter):
+        if isinstance(hook, Meter):
             container = self.meter_hooks
-            self.meters.pop(cb.name, None)
+            self.meters.pop(hook.name, None)
         else:
             container = self.callback_hooks
-            self.callbacks.remove(cb)
+            self.callbacks.remove(hook)
 
         for name in self.hook_entries:
-            entry = getattr(cb, name, None)
+            entry = getattr(hook, name, None)
             if entry is not None:
                 container[name].remove(entry)
 
     def terminate(self, raise_exception=True):
-        self.notify_callback('on_terminated', None)
+        self.notify_registered_hooks('on_terminated', None)
         if raise_exception:
             raise TrainerTerminated()
 
@@ -104,7 +89,7 @@ class Trainer(object):
         self.trainer_ended = True
         return 0
 
-    def notify_callback(self, name, state):
+    def notify_registered_hooks(self, name, state):
         for hook in self.meter_hooks[name]:
             hook(self, state)
         if name == 'on_epoch_end':
@@ -140,13 +125,13 @@ class Trainer(object):
         }
         if checkpoint is not None:
             self.restore_state(state, checkpoint)
-        self.notify_callback('on_train_start', state)
+        self.notify_registered_hooks('on_train_start', state)
         iter_epoch = trange(max_epoch, initial=state['epochs'], unit='epoch')
         iter_epoch.set_description('Train')
         for epoch in iter_epoch:
             model.train(True)
             state['epochs'] = epoch + 1
-            self.notify_callback('on_epoch_start', state)
+            self.notify_registered_hooks('on_epoch_start', state)
 
             iter_data = tqdm(data_loader, unit=' batches')
             iter_data.set_description('Epoch ' + str(epoch))
@@ -155,7 +140,7 @@ class Trainer(object):
                 state['iters'] += 1
                 state['input'] = input
                 state['target'] = target
-                self.notify_callback('on_batch_start', state)
+                self.notify_registered_hooks('on_batch_start', state)
 
                 if use_cuda:
                     input = input.cuda(device_id, async=True)
@@ -171,23 +156,23 @@ class Trainer(object):
                                           loss=loss.data[0])
                     state['output'] = output
                     state['loss'] = loss
-                    self.notify_callback('on_forward_end', state)
+                    self.notify_registered_hooks('on_forward_end', state)
                     loss.backward()
-                    self.notify_callback('on_backward_end', state)
+                    self.notify_registered_hooks('on_backward_end', state)
                     # Free memory
                     state['output'] = None
                     state['loss'] = None
                     return loss
 
                 state['optimizer'].step(closure)
-                self.notify_callback('on_batch_end', state)
+                self.notify_registered_hooks('on_batch_end', state)
                 if self.trainer_ended:
                     break
-            self.notify_callback('on_epoch_end', state)
+            self.notify_registered_hooks('on_epoch_end', state)
             if self.trainer_ended:
                 break
         self.trainer_ended = True
-        self.notify_callback('on_train_end', state)
+        self.notify_registered_hooks('on_train_end', state)
         return state
 
     def validate(self, epochs=-1):
@@ -208,7 +193,7 @@ class Trainer(object):
             'iters': 0,
             'meters': meters,
         }
-        self.notify_callback('on_validate_start', state)
+        self.notify_registered_hooks('on_validate_start', state)
         iter_data = tqdm(data_loader, unit=' batches')
         iter_data.set_description('Validate')
         for batch in iter_data:
@@ -216,7 +201,7 @@ class Trainer(object):
             state['iters'] += 1
             state['input'] = input
             state['target'] = target
-            self.notify_callback('on_batch_start', state)
+            self.notify_registered_hooks('on_batch_start', state)
 
             if use_cuda:
                 input = input.cuda(device_id, async=True)
@@ -230,15 +215,15 @@ class Trainer(object):
                 iter_data.set_postfix(loss=loss.data[0])
                 state['output'] = output
                 state['val_loss'] = loss
-                self.notify_callback('on_forward_end', state)
+                self.notify_registered_hooks('on_forward_end', state)
                 # Free memory
                 state['output'] = None
                 state['val_loss'] = None
                 return loss
 
             closure()
-            self.notify_callback('on_batch_end', state)
-        self.notify_callback('on_validate_end', state)
+            self.notify_registered_hooks('on_batch_end', state)
+        self.notify_registered_hooks('on_validate_end', state)
         return state
 
     def test(self, test_data_loader=None):
@@ -261,7 +246,7 @@ class Trainer(object):
             'iters': 0,
             'meters': meters,
         }
-        self.notify_callback('on_test_start', state)
+        self.notify_registered_hooks('on_test_start', state)
         iter_data = tqdm(data_loader, unit=' batches')
         iter_data.set_description('Test')
         for batch in iter_data:
@@ -269,7 +254,7 @@ class Trainer(object):
             state['iters'] += 1
             state['input'] = input
             state['target'] = target
-            self.notify_callback('on_batch_start', state)
+            self.notify_registered_hooks('on_batch_start', state)
 
             if use_cuda:
                 input = input.cuda(device_id, async=True)
@@ -283,13 +268,13 @@ class Trainer(object):
                 iter_data.set_postfix(loss=loss.data[0])
                 state['output'] = output
                 state['test_loss'] = loss
-                self.notify_callback('on_forward_end', state)
+                self.notify_registered_hooks('on_forward_end', state)
                 # Free memory
                 state['output'] = None
                 state['test_loss'] = None
                 return loss
 
             closure()
-            self.notify_callback('on_batch_end', state)
-        self.notify_callback('on_test_end', state)
+            self.notify_registered_hooks('on_batch_end', state)
+        self.notify_registered_hooks('on_test_end', state)
         return state

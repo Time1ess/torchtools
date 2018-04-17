@@ -39,7 +39,7 @@ class TestAccuracyMeter(unittest.TestCase):
             [2],
         ])
         pred = Variable(torch.from_numpy(pred))
-        target = Variable(torch.from_numpy(target))
+        target = torch.from_numpy(target)
 
         state = {}
         state['mode'] = TRAIN_MODE
@@ -63,7 +63,7 @@ class TestErrorMeter(unittest.TestCase):
             [2],
         ])
         pred = Variable(torch.from_numpy(pred))
-        target = Variable(torch.from_numpy(target))
+        target = torch.from_numpy(target)
 
         state = {}
         state['mode'] = TRAIN_MODE

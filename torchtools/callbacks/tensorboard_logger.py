@@ -7,9 +7,9 @@ from torchtools.meters import EPOCH_RESET, BATCH_RESET
 
 class TensorBoardLogger(Callback):
     def __init__(self, log_dir=None, ignores=None, log_model_graph=False,
-                 log_param_interval=0, *args, **kwargs):
+                 comment='', log_param_interval=0, *args, **kwargs):
         super(TensorBoardLogger, self).__init__(*args, **kwargs)
-        self.writer = SummaryWriter(log_dir)
+        self.writer = SummaryWriter(log_dir, comment=comment)
         if ignores is None:
             ignores = []
         self.ignores = ignores
@@ -28,16 +28,16 @@ class TensorBoardLogger(Callback):
         method(meter.alias, meter.value, step)
 
     def log_image(self, tag, img_tensor, step=None):
-        self.board.add_image(tag, img_tensor, step)
+        self.writer.add_image(tag, img_tensor, step)
 
     def log_scalar(self, tag, scalar_value, step=None):
-        self.board.add_scalar(tag, scalar_value, step)
+        self.writer.add_scalar(tag, scalar_value, step)
 
     def log_graph(self, model, input):
-        self.board.add_graph(model, input)
+        self.writer.add_graph(model, input)
 
     def log_hist(self, tag, value, step=None, bins='tensorflow'):
-        self.board.add_histogram(tag, value, step, bins)
+        self.writer.add_histogram(tag, value, step, bins)
 
     def log_text(self):
         pass
