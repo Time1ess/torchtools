@@ -104,8 +104,9 @@ class TestCSVLogger(unittest.TestCase):
         fpath = osp.join(log_dir, 'training_log.csv')
         with open(fpath, 'r') as f:
             data = ''.join(f.readlines())
+        print(repr(data))
         pat = re.compile(
-            r'timestamp,loss[\r]\n\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}\.\d+,')
+            r'timestamp,loss\r*\n\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}\.\d+,')
         self.assertIsNot(pat.match(data), None)
         csv_logger.on_train_end(trainer, state)
 
