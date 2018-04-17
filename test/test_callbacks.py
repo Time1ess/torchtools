@@ -1,4 +1,5 @@
 # coding: UTF-8
+import sys
 import os
 import os.path as osp
 import re
@@ -6,7 +7,10 @@ import unittest
 import tempfile
 
 from random import randint, random
-from unittest.mock import Mock, patch
+if sys.version_info >= (3, 3):
+    from unittest.mock import Mock, patch
+else:
+    from mock import Mock, patch
 
 import torch
 import torch.optim as optim
@@ -101,7 +105,7 @@ class TestCSVLogger(unittest.TestCase):
         with open(fpath, 'r') as f:
             data = ''.join(f.readlines())
         pat = re.compile(
-            r'timestamp,loss\n\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}\.\d+,')
+            r'timestamp,loss[\r]\n\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}\.\d+,')
         self.assertIsNot(pat.match(data), None)
         csv_logger.on_train_end(trainer, state)
 

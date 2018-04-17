@@ -28,10 +28,10 @@ class AccuracyMeter(EpochMeter):
     def value(self):
         if self.total_cnt == 0:
             return 0
-        return self.scaling * self.correct_cnt / self.total_cnt
+        return 1. * self.scaling * self.correct_cnt / self.total_cnt
 
 
 class ErrorMeter(AccuracyMeter):
     @property
     def value(self):
-        return self.scaling * (1 - self.correct_cnt / self.total_cnt)
+        return self.scaling * (1. - 1. * self.correct_cnt / self.total_cnt)

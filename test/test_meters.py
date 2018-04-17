@@ -46,7 +46,7 @@ class TestAccuracyMeter(unittest.TestCase):
         state['output'] = pred
         state['target'] = target
         meter.on_forward_end(None, state)
-        self.assertAlmostEqual(meter.value, 100 * 2 / 3)
+        self.assertAlmostEqual(meter.value, 100. * 2 / 3)
 
 
 class TestErrorMeter(unittest.TestCase):
@@ -70,7 +70,7 @@ class TestErrorMeter(unittest.TestCase):
         state['output'] = pred
         state['target'] = target
         meter.on_forward_end(None, state)
-        self.assertAlmostEqual(meter.value, 100 * 1 / 3)
+        self.assertAlmostEqual(meter.value, 100. * 1 / 3)
 
 
 class TestLossMeter(unittest.TestCase):
