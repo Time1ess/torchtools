@@ -6,13 +6,10 @@ from torchtools.meters import EPOCH_RESET, BATCH_RESET
 
 
 class TensorBoardLogger(Callback):
-    writer = None
-
     def __init__(self, log_dir=None, ignores=None, log_model_graph=False,
                  log_param_interval=0, *args, **kwargs):
         super(TensorBoardLogger, self).__init__(*args, **kwargs)
-        if self.writer is None:
-            type(self).writer = SummaryWriter(log_dir)
+        self.writer = SummaryWriter(log_dir)
         if ignores is None:
             ignores = []
         self.ignores = ignores
