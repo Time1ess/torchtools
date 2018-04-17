@@ -72,8 +72,7 @@ def main():
         ToTensor(True),
         T.Normalize(
             VOCClassSegmentation.mean_rgb_norm,
-            VOCClassSegmentation.std_rgb_norm),
-        ])
+            VOCClassSegmentation.std_rgb_norm)])
     pair_trans = T.Compose([
         T.Scale(512),
         PairRandomCrop(512),

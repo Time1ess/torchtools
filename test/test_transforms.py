@@ -1,11 +1,4 @@
-#!/usr/bin/env python3
 # coding: UTF-8
-# Author: David
-# Email: youchen.du@gmail.com
-# Created: 2017-09-07 17:07
-# Last modified: 2017-09-11 14:34
-# Filename: test_transforms.py
-# Description:
 import unittest
 
 import torch
@@ -67,12 +60,12 @@ class TestToTensor(unittest.TestCase):
     def test_no_rescale(self):
         x = np.arange(0, 64 * 3).reshape(8, 8, 3)
         tensor = ToTensor(False)(x)
-        self.assertAlmostEqual(tensor.max(), 64*3-1)
+        self.assertAlmostEqual(tensor.max(), 64 * 3 - 1)
 
     def test_rescale(self):
         x = np.arange(0, 64 * 3).reshape(8, 8, 3)
         tensor = ToTensor()(x)
-        self.assertAlmostEqual(tensor.max(), (64*3-1)/255.0)
+        self.assertAlmostEqual(tensor.max(), (64 * 3 - 1) / 255.0)
 
 
 class TestTranspose(unittest.TestCase):
