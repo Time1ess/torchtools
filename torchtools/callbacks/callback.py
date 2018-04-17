@@ -12,9 +12,6 @@ class Hook(object):
     """
     Abstract class.
     """
-    def __init__(self, *args, **kwargs):
-        super(Hook, self).__init__(*args, **kwargs)
-
     def on_train_start(self, trainer, state):
         pass
 
@@ -54,16 +51,13 @@ class Hook(object):
     def on_terminated(self, trainer, state):
         pass
 
-    def has_hook_conflict(self, trainer):
-        pass
-
-    def _teardown(self):
-        super(Hook, self)._teardown()
-
     def __str__(self):
         return type(self).__name__
 
 
 class Callback(Hook):
-    def __init__(self, *args, **kwargs):
-        super(Callback, self).__init__(*args, **kwargs)
+    def _callback_check(self, trainer):
+        pass
+
+    def _teardown(self):
+        pass

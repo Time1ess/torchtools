@@ -1,53 +1,38 @@
-#!/usr/local/bin/python3
 # coding: UTF-8
-# Author: David
-# Email: youchen.du@gmail.com
-# Created: 2017-08-14 21:35
-# Last modified: 2017-09-10 16:52
-# Filename: csvlogger.py
-# Description:
 import os
 import csv
 
 from datetime import datetime
 
-from .callback import Callback
+from torchtools.callbacks.callback import Callback
 
 
 class CSVLogger(Callback):
-    def __init__(self,
-                 directory='logs',
-                 fname='training_log',
-                 ext='csv',
-                 separator=',',
-                 keys=None,
-                 append=False):
+    def __init__(self, log_dir=None, comment='', separator=',',
+                 keys=None, header=True, timestamp=True, datetime_fmt=None):
         super(CSVLogger, self).__init__()
-        if not os.path.exists(directory):
-            os.makedirs(directory)
-        self.fpath = os.path.join(directory, fname) + '.' + ext
+        if not log_dir:
+            import socket
+            from datetime import datetime
+            now = datetime.now().strftime('%b%d_%H-%M-%S')
+            hostname = socket.gethostname()
+            log_dir = os.path.join('logs', now + '_' + hostname + comment)
+        if not os.path.exists(log_dir):
+            os.makedirs(log_dir)
+        self.fpath = os.path.join(log_dir, 'training_log.csv')
         self.sep = separator
-        self.writer = None
-        if keys is None:
-            self.keys = ['timestamp', 'epochs', 'val_loss']
-        elif not (isinstance(keys, list) or isinstance(keys, str)):
-            raise ValueError('keys {} is not supported'.format(repr(keys)))
-        elif isinstance(keys, str):
-            self.keys = [keys]
+        assert isinstance(keys, list) or isinstance(keys, tuple)
+        if timestamp:
+            self.keys = ['timestamp']
         else:
-            self.keys = keys
-        self.append = append
-        self.append_header = True
-        self.csv_file = None
+            self.keys = []
+        if keys is not None:
+            self.keys.extend(keys)
+        self.header = header
+        self.datetime_fmt = datetime_fmt
 
     def on_train_start(self, trainer, state):
-        if self.append:
-            if os.path.exists(self.fpath):
-                with open(self.fpath) as f:
-                    self.append_header = not bool(len(f.readline()))
-            self.csv_file = open(self.fpath, 'a')
-        else:
-            self.csv_file = open(self.fpath, 'w')
+        self.csv_file = open(self.fpath, 'w')
 
         class CustomDialect(csv.excel):
             delimiter = self.sep
@@ -56,13 +41,17 @@ class CSVLogger(Callback):
             self.csv_file,
             fieldnames=self.keys,
             dialect=CustomDialect)
-        if self.append_header:
+
+        if self.header:
             self.writer.writeheader()
 
     def on_epoch_end(self, trainer, state):
         def handle_value(key):
             if key == 'timestamp':
-                return datetime.now()
+                now = datetime.now()
+                if self.datetime_fmt is not None:
+                    return now.strftime(self.datetime_fmt)
+                return now
             elif key in state['meters']:
                 return state['meters'][key].value
             elif key in state:
