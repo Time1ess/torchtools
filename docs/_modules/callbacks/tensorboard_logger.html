@@ -1,0 +1,330 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>callbacks.tensorboard_logger &mdash; torchtools 0.1.3 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> torchtools
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.3
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Welcome to torchtools’s documentation!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../trainer.html">1. Trainer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../callbacks.html">2. Callbacks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meters.html">3. Meters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../exceptions.html">4. Exceptions</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">torchtools</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>callbacks.tensorboard_logger</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for callbacks.tensorboard_logger</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">tensorboardX</span> <span class="k">import</span> <span class="n">SummaryWriter</span>
+
+<span class="kn">from</span> <span class="nn">torchtools</span> <span class="k">import</span> <span class="n">TRAIN_MODE</span>
+<span class="kn">from</span> <span class="nn">torchtools.callbacks</span> <span class="k">import</span> <span class="n">Callback</span>
+<span class="kn">from</span> <span class="nn">torchtools.meters</span> <span class="k">import</span> <span class="n">EPOCH_RESET</span><span class="p">,</span> <span class="n">BATCH_RESET</span>
+
+
+<div class="viewcode-block" id="TensorBoardLogger"><a class="viewcode-back" href="../../callbacks.html#callbacks.tensorboard_logger.TensorBoardLogger">[docs]</a><span class="k">class</span> <span class="nc">TensorBoardLogger</span><span class="p">(</span><span class="n">Callback</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Callback that logs epoch results to a TensorBoard file.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="TensorBoardLogger.__init__"><a class="viewcode-back" href="../../callbacks.html#callbacks.tensorboard_logger.TensorBoardLogger.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">log_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">ignores</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">log_model_graph</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">log_param_interval</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialization for TensorBoardLogger.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        log_dir: str</span>
+<span class="sd">            Path to save tensorboard file,</span>
+<span class="sd">            Default: &#39;runs/{fmt_datetime}_{hostname}{comment}&#39;.</span>
+<span class="sd">        comment: str</span>
+<span class="sd">            Comment that appends to the log_dir. Default: &#39;&#39;.</span>
+<span class="sd">        ignores: list</span>
+<span class="sd">            A list of names will be not logged. Default: None.</span>
+<span class="sd">        log_model_graph: bool</span>
+<span class="sd">            Whether to save model graph definition. Default: False.</span>
+<span class="sd">        log_param_interlval: int</span>
+<span class="sd">            Number of epochs between logging parameters histogram.</span>
+<span class="sd">            Default: 0(No log).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TensorBoardLogger</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">writer</span> <span class="o">=</span> <span class="n">SummaryWriter</span><span class="p">(</span><span class="n">log_dir</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="n">comment</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ignores</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ignores</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ignores</span> <span class="o">=</span> <span class="n">ignores</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_model_graph</span> <span class="o">=</span> <span class="n">log_model_graph</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_param_interval</span> <span class="o">=</span> <span class="n">log_param_interval</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">epochs_since_logged_params</span> <span class="o">=</span> <span class="mi">0</span></div>
+
+    <span class="k">def</span> <span class="nf">_teardown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">writer</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">meter</span><span class="p">):</span>
+        <span class="n">log_type</span> <span class="o">=</span> <span class="n">meter</span><span class="o">.</span><span class="n">meter_type</span>
+        <span class="n">method</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;log_&#39;</span> <span class="o">+</span> <span class="n">log_type</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">method</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">method</span><span class="p">(</span><span class="n">meter</span><span class="o">.</span><span class="n">alias</span><span class="p">,</span> <span class="n">meter</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">step</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">log_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span> <span class="n">img_tensor</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">writer</span><span class="o">.</span><span class="n">add_image</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">img_tensor</span><span class="p">,</span> <span class="n">step</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">log_scalar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span> <span class="n">scalar_value</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">writer</span><span class="o">.</span><span class="n">add_scalar</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">scalar_value</span><span class="p">,</span> <span class="n">step</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">log_graph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">writer</span><span class="o">.</span><span class="n">add_graph</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="nb">input</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">log_hist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="s1">&#39;tensorflow&#39;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">writer</span><span class="o">.</span><span class="n">add_histogram</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">bins</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">log_text</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">log_audio</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">_log_model_and_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trainer</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;mode&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">TRAIN_MODE</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">log_model_graph</span><span class="p">:</span>
+            <span class="n">model</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;model&#39;</span><span class="p">]</span>
+            <span class="nb">input</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log_graph</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="nb">input</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log_model_graph</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">log_param_interval</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">epochs_since_logged_params</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">epochs_since_logged_params</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">log_param_interval</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">epochs_since_logged_params</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="n">model</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;model&#39;</span><span class="p">]</span>
+        <span class="n">epochs</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;epochs&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">params</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">named_parameters</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log_hist</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">params</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">epochs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__on_batch_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trainer</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Deprecated&quot;&quot;&quot;</span>
+        <span class="n">iters</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;iters&#39;</span><span class="p">]</span>
+        <span class="n">mode</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;mode&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">meter</span> <span class="ow">in</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;meters&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">meter</span><span class="o">.</span><span class="n">meter_mode</span> <span class="o">!=</span> <span class="n">mode</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">meter</span><span class="o">.</span><span class="n">reset_mode</span> <span class="o">==</span> <span class="n">BATCH_RESET</span> <span class="ow">and</span> \
+                    <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignores</span> <span class="ow">and</span> <span class="n">meter</span><span class="o">.</span><span class="n">can_call</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">iters</span><span class="p">,</span> <span class="n">meter</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">on_epoch_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trainer</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log_model_and_params</span><span class="p">(</span><span class="n">trainer</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+
+        <span class="n">epochs</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;epochs&#39;</span><span class="p">]</span>
+        <span class="n">mode</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;mode&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">meter</span> <span class="ow">in</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;meters&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">meter</span><span class="o">.</span><span class="n">mode</span> <span class="o">!=</span> <span class="n">mode</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">alias</span> <span class="o">=</span> <span class="n">meter</span><span class="o">.</span><span class="n">alias</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">meter</span><span class="o">.</span><span class="n">reset_mode</span> <span class="o">==</span> <span class="n">EPOCH_RESET</span> <span class="ow">and</span>
+                    <span class="n">alias</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignores</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">epochs</span><span class="p">,</span> <span class="n">meter</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">on_validate_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trainer</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">on_epoch_end</span><span class="p">(</span><span class="n">trainer</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Youchen Du.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.1.3',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>
