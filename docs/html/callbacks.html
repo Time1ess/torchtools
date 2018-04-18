@@ -25,15 +25,15 @@
   
 
   
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="3. Meters" href="meters.html" />
     <link rel="prev" title="1. Trainer" href="trainer.html" /> 
 
   
-  <script src="_static/js/modernizr.min.js"></script>
+  <script src="static/js/modernizr.min.js"></script>
 
 </head>
 
@@ -154,7 +154,7 @@
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="_sources/callbacks.rst.txt" rel="nofollow"> View page source</a>
+            <a href="sources/callbacks.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -173,7 +173,7 @@
 <h2>2.1. Hook<a class="headerlink" href="#hook" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="callbacks.callback.Hook">
-<em class="property">class </em><code class="descclassname">callbacks.callback.</code><code class="descname">Hook</code><a class="reference internal" href="_modules/callbacks/callback.html#Hook"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#callbacks.callback.Hook" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">callbacks.callback.</code><code class="descname">Hook</code><a class="reference internal" href="modules/callbacks/callback.html#Hook"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#callbacks.callback.Hook" title="Permalink to this definition">¶</a></dt>
 <dd><p>Base class for all callbacks and meters</p>
 </dd></dl>
 
@@ -182,7 +182,7 @@
 <h2>2.2. Callback<a class="headerlink" href="#callback" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="callbacks.callback.Callback">
-<em class="property">class </em><code class="descclassname">callbacks.callback.</code><code class="descname">Callback</code><a class="reference internal" href="_modules/callbacks/callback.html#Callback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#callbacks.callback.Callback" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">callbacks.callback.</code><code class="descname">Callback</code><a class="reference internal" href="modules/callbacks/callback.html#Callback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#callbacks.callback.Callback" title="Permalink to this definition">¶</a></dt>
 <dd><p>Base class for all callbacks.</p>
 </dd></dl>
 
@@ -191,12 +191,12 @@
 <h2>2.3. ModelCheckPoint<a class="headerlink" href="#modelcheckpoint" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="callbacks.checkpoint.ModelCheckPoint">
-<em class="property">class </em><code class="descclassname">callbacks.checkpoint.</code><code class="descname">ModelCheckPoint</code><span class="sig-paren">(</span><em>save_dir=None</em>, <em>fname='{arch}_{epochs:05d}_{val_loss:.2f}.pt'</em>, <em>monitor='val_loss'</em>, <em>mode='auto'</em>, <em>period=1</em>, <em>save_best_only=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/callbacks/checkpoint.html#ModelCheckPoint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#callbacks.checkpoint.ModelCheckPoint" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">callbacks.checkpoint.</code><code class="descname">ModelCheckPoint</code><span class="sig-paren">(</span><em>save_dir=None</em>, <em>fname='{arch}_{epochs:05d}_{val_loss:.2f}.pt'</em>, <em>monitor='val_loss'</em>, <em>mode='auto'</em>, <em>period=1</em>, <em>save_best_only=True</em><span class="sig-paren">)</span><a class="reference internal" href="modules/callbacks/checkpoint.html#ModelCheckPoint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#callbacks.checkpoint.ModelCheckPoint" title="Permalink to this definition">¶</a></dt>
 <dd><p>Callback that saves model checkpoint.</p>
 <p>This callback will save current training state to save_dir/fname.</p>
 <dl class="method">
 <dt id="callbacks.checkpoint.ModelCheckPoint.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>save_dir=None</em>, <em>fname='{arch}_{epochs:05d}_{val_loss:.2f}.pt'</em>, <em>monitor='val_loss'</em>, <em>mode='auto'</em>, <em>period=1</em>, <em>save_best_only=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/callbacks/checkpoint.html#ModelCheckPoint.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#callbacks.checkpoint.ModelCheckPoint.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>save_dir=None</em>, <em>fname='{arch}_{epochs:05d}_{val_loss:.2f}.pt'</em>, <em>monitor='val_loss'</em>, <em>mode='auto'</em>, <em>period=1</em>, <em>save_best_only=True</em><span class="sig-paren">)</span><a class="reference internal" href="modules/callbacks/checkpoint.html#ModelCheckPoint.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#callbacks.checkpoint.ModelCheckPoint.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialization for ModelCheckPoint.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -229,11 +229,11 @@ otherwise the model will be saved every period. Default: True.</li>
 <h2>2.4. CSVLogger<a class="headerlink" href="#csvlogger" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="callbacks.csvlogger.CSVLogger">
-<em class="property">class </em><code class="descclassname">callbacks.csvlogger.</code><code class="descname">CSVLogger</code><span class="sig-paren">(</span><em>log_dir=None</em>, <em>comment=''</em>, <em>separator='</em>, <em>'</em>, <em>keys=None</em>, <em>header=True</em>, <em>timestamp=True</em>, <em>datetime_fmt=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/callbacks/csvlogger.html#CSVLogger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#callbacks.csvlogger.CSVLogger" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">callbacks.csvlogger.</code><code class="descname">CSVLogger</code><span class="sig-paren">(</span><em>log_dir=None</em>, <em>comment=''</em>, <em>separator='</em>, <em>'</em>, <em>keys=None</em>, <em>header=True</em>, <em>timestamp=True</em>, <em>datetime_fmt=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/callbacks/csvlogger.html#CSVLogger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#callbacks.csvlogger.CSVLogger" title="Permalink to this definition">¶</a></dt>
 <dd><p>Callback that logs epoch results to a CSV file.</p>
 <dl class="method">
 <dt id="callbacks.csvlogger.CSVLogger.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>log_dir=None</em>, <em>comment=''</em>, <em>separator='</em>, <em>'</em>, <em>keys=None</em>, <em>header=True</em>, <em>timestamp=True</em>, <em>datetime_fmt=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/callbacks/csvlogger.html#CSVLogger.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#callbacks.csvlogger.CSVLogger.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>log_dir=None</em>, <em>comment=''</em>, <em>separator='</em>, <em>'</em>, <em>keys=None</em>, <em>header=True</em>, <em>timestamp=True</em>, <em>datetime_fmt=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/callbacks/csvlogger.html#CSVLogger.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#callbacks.csvlogger.CSVLogger.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialization for CSVLogger.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -262,11 +262,11 @@ Default: ‘logs/{fmt_datetime}_{hostname}{comment}’.</li>
 <h2>2.5. EarlyStopping<a class="headerlink" href="#earlystopping" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="callbacks.early_stopping.EarlyStopping">
-<em class="property">class </em><code class="descclassname">callbacks.early_stopping.</code><code class="descname">EarlyStopping</code><span class="sig-paren">(</span><em>monitor='val_loss'</em>, <em>mode='auto'</em>, <em>patience=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/callbacks/early_stopping.html#EarlyStopping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#callbacks.early_stopping.EarlyStopping" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">callbacks.early_stopping.</code><code class="descname">EarlyStopping</code><span class="sig-paren">(</span><em>monitor='val_loss'</em>, <em>mode='auto'</em>, <em>patience=0</em><span class="sig-paren">)</span><a class="reference internal" href="modules/callbacks/early_stopping.html#EarlyStopping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#callbacks.early_stopping.EarlyStopping" title="Permalink to this definition">¶</a></dt>
 <dd><p>Callback that stops training if monitor value has stopped improving.</p>
 <dl class="method">
 <dt id="callbacks.early_stopping.EarlyStopping.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>monitor='val_loss'</em>, <em>mode='auto'</em>, <em>patience=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/callbacks/early_stopping.html#EarlyStopping.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#callbacks.early_stopping.EarlyStopping.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>monitor='val_loss'</em>, <em>mode='auto'</em>, <em>patience=0</em><span class="sig-paren">)</span><a class="reference internal" href="modules/callbacks/early_stopping.html#EarlyStopping.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#callbacks.early_stopping.EarlyStopping.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialization for EarlyStopping.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -295,14 +295,14 @@ training will be stopped, Default: 0.</li>
 <h2>2.6. LambdaLR<a class="headerlink" href="#lambdalr" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="callbacks.lr_scheduler.LambdaLR">
-<em class="property">class </em><code class="descclassname">callbacks.lr_scheduler.</code><code class="descname">LambdaLR</code><span class="sig-paren">(</span><em>optimizer</em>, <em>lr_lambda</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/callbacks/lr_scheduler.html#LambdaLR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#callbacks.lr_scheduler.LambdaLR" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">callbacks.lr_scheduler.</code><code class="descname">LambdaLR</code><span class="sig-paren">(</span><em>optimizer</em>, <em>lr_lambda</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="modules/callbacks/lr_scheduler.html#LambdaLR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#callbacks.lr_scheduler.LambdaLR" title="Permalink to this definition">¶</a></dt>
 <dd><p>Callback that sets the learning rate with a function.</p>
 <p>Sets the learning rate of each parameter group to the initial lr times
 a given function.</p>
 <p>This callback is a wrapper for PyTorch lr_schedulers.</p>
 <dl class="method">
 <dt id="callbacks.lr_scheduler.LambdaLR.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>optimizer</em>, <em>lr_lambda</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/callbacks/lr_scheduler.html#LambdaLR.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#callbacks.lr_scheduler.LambdaLR.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>optimizer</em>, <em>lr_lambda</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="modules/callbacks/lr_scheduler.html#LambdaLR.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#callbacks.lr_scheduler.LambdaLR.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialization for LambdaLR.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -327,14 +327,14 @@ in optimizer.param_groups.</li>
 <h2>2.7. StepLR<a class="headerlink" href="#steplr" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="callbacks.lr_scheduler.StepLR">
-<em class="property">class </em><code class="descclassname">callbacks.lr_scheduler.</code><code class="descname">StepLR</code><span class="sig-paren">(</span><em>optimizer</em>, <em>step_size</em>, <em>gamma=0.1</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/callbacks/lr_scheduler.html#StepLR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#callbacks.lr_scheduler.StepLR" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">callbacks.lr_scheduler.</code><code class="descname">StepLR</code><span class="sig-paren">(</span><em>optimizer</em>, <em>step_size</em>, <em>gamma=0.1</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="modules/callbacks/lr_scheduler.html#StepLR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#callbacks.lr_scheduler.StepLR" title="Permalink to this definition">¶</a></dt>
 <dd><p>Callback that sets the learning rate with a decay rate.</p>
 <p>Sets the learning rate of each parameter group to the initial lr decayed
 by gamma every step_size epochs.</p>
 <p>This callback is a wrapper for PyTorch lr_schedulers.</p>
 <dl class="method">
 <dt id="callbacks.lr_scheduler.StepLR.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>optimizer</em>, <em>step_size</em>, <em>gamma=0.1</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/callbacks/lr_scheduler.html#StepLR.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#callbacks.lr_scheduler.StepLR.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>optimizer</em>, <em>step_size</em>, <em>gamma=0.1</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="modules/callbacks/lr_scheduler.html#StepLR.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#callbacks.lr_scheduler.StepLR.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialization for StepLR.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -358,14 +358,14 @@ by gamma every step_size epochs.</p>
 <h2>2.8. MultiStepLR<a class="headerlink" href="#multisteplr" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="callbacks.lr_scheduler.MultiStepLR">
-<em class="property">class </em><code class="descclassname">callbacks.lr_scheduler.</code><code class="descname">MultiStepLR</code><span class="sig-paren">(</span><em>optimizer</em>, <em>milestones</em>, <em>gamma=0.1</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/callbacks/lr_scheduler.html#MultiStepLR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#callbacks.lr_scheduler.MultiStepLR" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">callbacks.lr_scheduler.</code><code class="descname">MultiStepLR</code><span class="sig-paren">(</span><em>optimizer</em>, <em>milestones</em>, <em>gamma=0.1</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="modules/callbacks/lr_scheduler.html#MultiStepLR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#callbacks.lr_scheduler.MultiStepLR" title="Permalink to this definition">¶</a></dt>
 <dd><p>Callback that sets the learning rate with epoch milestones.</p>
 <p>Set the learning rate of each parameter group to the initial lr decayed
 by gamma once the number of epoch reaches one of the milestones.</p>
 <p>This callback is a wrapper for PyTorch lr_schedulers.</p>
 <dl class="method">
 <dt id="callbacks.lr_scheduler.MultiStepLR.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>optimizer</em>, <em>milestones</em>, <em>gamma=0.1</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/callbacks/lr_scheduler.html#MultiStepLR.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#callbacks.lr_scheduler.MultiStepLR.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>optimizer</em>, <em>milestones</em>, <em>gamma=0.1</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="modules/callbacks/lr_scheduler.html#MultiStepLR.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#callbacks.lr_scheduler.MultiStepLR.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialization for MultiStepLR.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -389,14 +389,14 @@ by gamma once the number of epoch reaches one of the milestones.</p>
 <h2>2.9. ExponentialLR<a class="headerlink" href="#exponentiallr" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="callbacks.lr_scheduler.ExponentialLR">
-<em class="property">class </em><code class="descclassname">callbacks.lr_scheduler.</code><code class="descname">ExponentialLR</code><span class="sig-paren">(</span><em>optimizer</em>, <em>gamma</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/callbacks/lr_scheduler.html#ExponentialLR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#callbacks.lr_scheduler.ExponentialLR" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">callbacks.lr_scheduler.</code><code class="descname">ExponentialLR</code><span class="sig-paren">(</span><em>optimizer</em>, <em>gamma</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="modules/callbacks/lr_scheduler.html#ExponentialLR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#callbacks.lr_scheduler.ExponentialLR" title="Permalink to this definition">¶</a></dt>
 <dd><p>Callback that sets the learning rate with a decay rate.</p>
 <p>Set the learning rate of each parameter group to the initial lr decayed
 by gamma every epoch.</p>
 <p>This callback is a wrapper for PyTorch lr_schedulers.</p>
 <dl class="method">
 <dt id="callbacks.lr_scheduler.ExponentialLR.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>optimizer</em>, <em>gamma</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/callbacks/lr_scheduler.html#ExponentialLR.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#callbacks.lr_scheduler.ExponentialLR.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>optimizer</em>, <em>gamma</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="modules/callbacks/lr_scheduler.html#ExponentialLR.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#callbacks.lr_scheduler.ExponentialLR.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialization for ExponentialLR.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -419,7 +419,7 @@ by gamma every epoch.</p>
 <h2>2.10. ReduceLROnPlateau<a class="headerlink" href="#reducelronplateau" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="callbacks.lr_scheduler.ReduceLROnPlateau">
-<em class="property">class </em><code class="descclassname">callbacks.lr_scheduler.</code><code class="descname">ReduceLROnPlateau</code><span class="sig-paren">(</span><em>optimizer</em>, <em>monitor</em>, <em>mode='min'</em>, <em>factor=0.1</em>, <em>patience=10</em>, <em>threshold=0.0001</em>, <em>threshold_mode='rel'</em>, <em>cooldown=0</em>, <em>min_lr=0</em>, <em>eps=1e-08</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/callbacks/lr_scheduler.html#ReduceLROnPlateau"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#callbacks.lr_scheduler.ReduceLROnPlateau" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">callbacks.lr_scheduler.</code><code class="descname">ReduceLROnPlateau</code><span class="sig-paren">(</span><em>optimizer</em>, <em>monitor</em>, <em>mode='min'</em>, <em>factor=0.1</em>, <em>patience=10</em>, <em>threshold=0.0001</em>, <em>threshold_mode='rel'</em>, <em>cooldown=0</em>, <em>min_lr=0</em>, <em>eps=1e-08</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="modules/callbacks/lr_scheduler.html#ReduceLROnPlateau"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#callbacks.lr_scheduler.ReduceLROnPlateau" title="Permalink to this definition">¶</a></dt>
 <dd><p>Callback that reduces the learning rate if monitor value stop improving.</p>
 <p>Reduce learning rate when a metric has stopped improving. Models often
 benefit from reducing the learning rate by a factor of 2-10 once learning
@@ -428,7 +428,7 @@ is seen for a <cite>patience</cite> number of epochs, the learning rate is reduc
 <p>This callback is a wrapper for PyTorch lr_schedulers.</p>
 <dl class="method">
 <dt id="callbacks.lr_scheduler.ReduceLROnPlateau.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>optimizer</em>, <em>monitor</em>, <em>mode='min'</em>, <em>factor=0.1</em>, <em>patience=10</em>, <em>threshold=0.0001</em>, <em>threshold_mode='rel'</em>, <em>cooldown=0</em>, <em>min_lr=0</em>, <em>eps=1e-08</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/callbacks/lr_scheduler.html#ReduceLROnPlateau.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#callbacks.lr_scheduler.ReduceLROnPlateau.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>optimizer</em>, <em>monitor</em>, <em>mode='min'</em>, <em>factor=0.1</em>, <em>patience=10</em>, <em>threshold=0.0001</em>, <em>threshold_mode='rel'</em>, <em>cooldown=0</em>, <em>min_lr=0</em>, <em>eps=1e-08</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="modules/callbacks/lr_scheduler.html#ReduceLROnPlateau.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#callbacks.lr_scheduler.ReduceLROnPlateau.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialization for ReduceLROnPlateau.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -471,11 +471,11 @@ old lr is smaller than eps, the update is ignored. Default: 1e-8.</li>
 <h2>2.11. TensorBoardLogger<a class="headerlink" href="#tensorboardlogger" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="callbacks.tensorboard_logger.TensorBoardLogger">
-<em class="property">class </em><code class="descclassname">callbacks.tensorboard_logger.</code><code class="descname">TensorBoardLogger</code><span class="sig-paren">(</span><em>log_dir=None</em>, <em>comment=''</em>, <em>ignores=None</em>, <em>log_model_graph=False</em>, <em>log_param_interval=0</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/callbacks/tensorboard_logger.html#TensorBoardLogger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#callbacks.tensorboard_logger.TensorBoardLogger" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">callbacks.tensorboard_logger.</code><code class="descname">TensorBoardLogger</code><span class="sig-paren">(</span><em>log_dir=None</em>, <em>comment=''</em>, <em>ignores=None</em>, <em>log_model_graph=False</em>, <em>log_param_interval=0</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="modules/callbacks/tensorboard_logger.html#TensorBoardLogger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#callbacks.tensorboard_logger.TensorBoardLogger" title="Permalink to this definition">¶</a></dt>
 <dd><p>Callback that logs epoch results to a TensorBoard file.</p>
 <dl class="method">
 <dt id="callbacks.tensorboard_logger.TensorBoardLogger.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>log_dir=None</em>, <em>comment=''</em>, <em>ignores=None</em>, <em>log_model_graph=False</em>, <em>log_param_interval=0</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/callbacks/tensorboard_logger.html#TensorBoardLogger.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#callbacks.tensorboard_logger.TensorBoardLogger.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>log_dir=None</em>, <em>comment=''</em>, <em>ignores=None</em>, <em>log_model_graph=False</em>, <em>log_param_interval=0</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="modules/callbacks/tensorboard_logger.html#TensorBoardLogger.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#callbacks.tensorboard_logger.TensorBoardLogger.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialization for TensorBoardLogger.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -551,15 +551,15 @@ Default: 0(No log).</li>
             SOURCELINK_SUFFIX: '.txt'
         };
     </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="static/jquery.js"></script>
+      <script type="text/javascript" src="static/underscore.js"></script>
+      <script type="text/javascript" src="static/doctools.js"></script>
 
   
 
   
   
-    <script type="text/javascript" src="_static/js/theme.js"></script>
+    <script type="text/javascript" src="static/js/theme.js"></script>
   
 
   <script type="text/javascript">

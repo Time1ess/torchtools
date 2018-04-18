@@ -25,15 +25,15 @@
   
 
   
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="4. Exceptions" href="exceptions.html" />
     <link rel="prev" title="2. Callbacks" href="callbacks.html" /> 
 
   
-  <script src="_static/js/modernizr.min.js"></script>
+  <script src="static/js/modernizr.min.js"></script>
 
 </head>
 
@@ -150,7 +150,7 @@
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="_sources/meters.rst.txt" rel="nofollow"> View page source</a>
+            <a href="sources/meters.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -169,11 +169,11 @@
 <h2>3.1. Meter<a class="headerlink" href="#meter" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="meters.meter.Meter">
-<em class="property">class </em><code class="descclassname">meters.meter.</code><code class="descname">Meter</code><span class="sig-paren">(</span><em>name</em>, <em>alias=None</em>, <em>scaling=1</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/meters/meter.html#Meter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#meters.meter.Meter" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">meters.meter.</code><code class="descname">Meter</code><span class="sig-paren">(</span><em>name</em>, <em>alias=None</em>, <em>scaling=1</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="modules/meters/meter.html#Meter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#meters.meter.Meter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Base class for all meters.</p>
 <dl class="method">
 <dt id="meters.meter.Meter.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>name</em>, <em>alias=None</em>, <em>scaling=1</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/meters/meter.html#Meter.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#meters.meter.Meter.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>name</em>, <em>alias=None</em>, <em>scaling=1</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="modules/meters/meter.html#Meter.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#meters.meter.Meter.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialization for Meter.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -204,7 +204,7 @@
 <h2>3.2. EpochMeter<a class="headerlink" href="#epochmeter" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="meters.meter.EpochMeter">
-<em class="property">class </em><code class="descclassname">meters.meter.</code><code class="descname">EpochMeter</code><span class="sig-paren">(</span><em>name</em>, <em>alias=None</em>, <em>scaling=1</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/meters/meter.html#EpochMeter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#meters.meter.EpochMeter" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">meters.meter.</code><code class="descname">EpochMeter</code><span class="sig-paren">(</span><em>name</em>, <em>alias=None</em>, <em>scaling=1</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="modules/meters/meter.html#EpochMeter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#meters.meter.EpochMeter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Meter that calls .reset() on every epoch start.</p>
 </dd></dl>
 
@@ -213,11 +213,11 @@
 <h2>3.3. AverageMeter<a class="headerlink" href="#averagemeter" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="meters.meter.AverageMeter">
-<em class="property">class </em><code class="descclassname">meters.meter.</code><code class="descname">AverageMeter</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/meters/meter.html#AverageMeter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#meters.meter.AverageMeter" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">meters.meter.</code><code class="descname">AverageMeter</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="modules/meters/meter.html#AverageMeter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#meters.meter.AverageMeter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Meter that computes the arithmetic mean and std.</p>
 <dl class="method">
 <dt id="meters.meter.AverageMeter.add">
-<code class="descname">add</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/meters/meter.html#AverageMeter.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#meters.meter.AverageMeter.add" title="Permalink to this definition">¶</a></dt>
+<code class="descname">add</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="modules/meters/meter.html#AverageMeter.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#meters.meter.AverageMeter.add" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a value to meter.</p>
 </dd></dl>
 
@@ -234,7 +234,7 @@
 <h2>3.4. AccuracyMeter<a class="headerlink" href="#accuracymeter" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="meters.accmeter.AccuracyMeter">
-<em class="property">class </em><code class="descclassname">meters.accmeter.</code><code class="descname">AccuracyMeter</code><span class="sig-paren">(</span><em>name</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/meters/accmeter.html#AccuracyMeter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#meters.accmeter.AccuracyMeter" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">meters.accmeter.</code><code class="descname">AccuracyMeter</code><span class="sig-paren">(</span><em>name</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="modules/meters/accmeter.html#AccuracyMeter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#meters.accmeter.AccuracyMeter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Meter that measures average accuracy for epoch.</p>
 <dl class="attribute">
 <dt id="meters.accmeter.AccuracyMeter.value">
@@ -249,7 +249,7 @@
 <h2>3.5. ErrorMeter<a class="headerlink" href="#errormeter" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="meters.accmeter.ErrorMeter">
-<em class="property">class </em><code class="descclassname">meters.accmeter.</code><code class="descname">ErrorMeter</code><span class="sig-paren">(</span><em>name</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/meters/accmeter.html#ErrorMeter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#meters.accmeter.ErrorMeter" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">meters.accmeter.</code><code class="descname">ErrorMeter</code><span class="sig-paren">(</span><em>name</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="modules/meters/accmeter.html#ErrorMeter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#meters.accmeter.ErrorMeter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Meter that measures average error rate for epoch.</p>
 <dl class="attribute">
 <dt id="meters.accmeter.ErrorMeter.value">
@@ -264,7 +264,7 @@
 <h2>3.6. LossMeter<a class="headerlink" href="#lossmeter" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="meters.lossmeter.LossMeter">
-<em class="property">class </em><code class="descclassname">meters.lossmeter.</code><code class="descname">LossMeter</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/meters/lossmeter.html#LossMeter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#meters.lossmeter.LossMeter" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">meters.lossmeter.</code><code class="descname">LossMeter</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="modules/meters/lossmeter.html#LossMeter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#meters.lossmeter.LossMeter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Meter that measures average loss for epoch.</p>
 </dd></dl>
 
@@ -273,7 +273,7 @@
 <h2>3.7. TimeMeter<a class="headerlink" href="#timemeter" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="meters.timemeter.TimeMeter">
-<em class="property">class </em><code class="descclassname">meters.timemeter.</code><code class="descname">TimeMeter</code><span class="sig-paren">(</span><em>name</em>, <em>alias=None</em>, <em>scaling=1</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/meters/timemeter.html#TimeMeter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#meters.timemeter.TimeMeter" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">meters.timemeter.</code><code class="descname">TimeMeter</code><span class="sig-paren">(</span><em>name</em>, <em>alias=None</em>, <em>scaling=1</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="modules/meters/timemeter.html#TimeMeter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#meters.timemeter.TimeMeter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Meter that measures elapsed time for epoch.</p>
 <dl class="attribute">
 <dt id="meters.timemeter.TimeMeter.value">
@@ -336,15 +336,15 @@
             SOURCELINK_SUFFIX: '.txt'
         };
     </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="static/jquery.js"></script>
+      <script type="text/javascript" src="static/underscore.js"></script>
+      <script type="text/javascript" src="static/doctools.js"></script>
 
   
 
   
   
-    <script type="text/javascript" src="_static/js/theme.js"></script>
+    <script type="text/javascript" src="static/js/theme.js"></script>
   
 
   <script type="text/javascript">

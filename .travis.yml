@@ -20,4 +20,4 @@ matrix:
         - env: LINT_CHECK
           python: "3.6"
           install: pip install flake8
-          script: flake8 --ignore=E402 --exclude palette.py,docs
+          script: flake8 --ignore=E402 --exclude palette.py,docs,build_docs

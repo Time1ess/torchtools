@@ -25,15 +25,15 @@
   
 
   
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="2. Callbacks" href="callbacks.html" />
     <link rel="prev" title="Welcome to torchtools’s documentation!" href="index.html" /> 
 
   
-  <script src="_static/js/modernizr.min.js"></script>
+  <script src="static/js/modernizr.min.js"></script>
 
 </head>
 
@@ -144,7 +144,7 @@
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="_sources/trainer.rst.txt" rel="nofollow"> View page source</a>
+            <a href="sources/trainer.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -163,11 +163,11 @@
 <h2>1.1. Trainer<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="trainer.Trainer">
-<em class="property">class </em><code class="descclassname">trainer.</code><code class="descname">Trainer</code><span class="sig-paren">(</span><em>model</em>, <em>train_data_loader</em>, <em>criterion</em>, <em>optimizer</em>, <em>val_data_loader=None</em>, <em>test_data_loader=None</em>, <em>use_cuda=True</em>, <em>device_id=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/trainer.html#Trainer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#trainer.Trainer" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">trainer.</code><code class="descname">Trainer</code><span class="sig-paren">(</span><em>model</em>, <em>train_data_loader</em>, <em>criterion</em>, <em>optimizer</em>, <em>val_data_loader=None</em>, <em>test_data_loader=None</em>, <em>use_cuda=True</em>, <em>device_id=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/trainer.html#Trainer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#trainer.Trainer" title="Permalink to this definition">¶</a></dt>
 <dd><p>A class to handle the whole training, validating and testing process</p>
 <dl class="method">
 <dt id="trainer.Trainer.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>model</em>, <em>train_data_loader</em>, <em>criterion</em>, <em>optimizer</em>, <em>val_data_loader=None</em>, <em>test_data_loader=None</em>, <em>use_cuda=True</em>, <em>device_id=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/trainer.html#Trainer.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#trainer.Trainer.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>model</em>, <em>train_data_loader</em>, <em>criterion</em>, <em>optimizer</em>, <em>val_data_loader=None</em>, <em>test_data_loader=None</em>, <em>use_cuda=True</em>, <em>device_id=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/trainer.html#Trainer.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#trainer.Trainer.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Instantiate a trainer object.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -191,13 +191,13 @@
 
 <dl class="method">
 <dt id="trainer.Trainer.exit">
-<code class="descname">exit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/trainer.html#Trainer.exit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#trainer.Trainer.exit" title="Permalink to this definition">¶</a></dt>
+<code class="descname">exit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="modules/trainer.html#Trainer.exit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#trainer.Trainer.exit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set trainer_ended flag to True.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="trainer.Trainer.notify_registered_hooks">
-<code class="descname">notify_registered_hooks</code><span class="sig-paren">(</span><em>name</em>, <em>state</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/trainer.html#Trainer.notify_registered_hooks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#trainer.Trainer.notify_registered_hooks" title="Permalink to this definition">¶</a></dt>
+<code class="descname">notify_registered_hooks</code><span class="sig-paren">(</span><em>name</em>, <em>state</em><span class="sig-paren">)</span><a class="reference internal" href="modules/trainer.html#Trainer.notify_registered_hooks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#trainer.Trainer.notify_registered_hooks" title="Permalink to this definition">¶</a></dt>
 <dd><p>Event dispatcher for all registered hooks.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -215,7 +215,7 @@
 
 <dl class="method">
 <dt id="trainer.Trainer.register_hook">
-<code class="descname">register_hook</code><span class="sig-paren">(</span><em>hook</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/trainer.html#Trainer.register_hook"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#trainer.Trainer.register_hook" title="Permalink to this definition">¶</a></dt>
+<code class="descname">register_hook</code><span class="sig-paren">(</span><em>hook</em><span class="sig-paren">)</span><a class="reference internal" href="modules/trainer.html#Trainer.register_hook"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#trainer.Trainer.register_hook" title="Permalink to this definition">¶</a></dt>
 <dd><p>Register a hook.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -229,7 +229,7 @@
 
 <dl class="method">
 <dt id="trainer.Trainer.register_hooks">
-<code class="descname">register_hooks</code><span class="sig-paren">(</span><em>hooks</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/trainer.html#Trainer.register_hooks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#trainer.Trainer.register_hooks" title="Permalink to this definition">¶</a></dt>
+<code class="descname">register_hooks</code><span class="sig-paren">(</span><em>hooks</em><span class="sig-paren">)</span><a class="reference internal" href="modules/trainer.html#Trainer.register_hooks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#trainer.Trainer.register_hooks" title="Permalink to this definition">¶</a></dt>
 <dd><p>Register multiple hooks at the same time.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -243,7 +243,7 @@
 
 <dl class="method">
 <dt id="trainer.Trainer.restore_state">
-<code class="descname">restore_state</code><span class="sig-paren">(</span><em>state</em>, <em>checkpoint</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/trainer.html#Trainer.restore_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#trainer.Trainer.restore_state" title="Permalink to this definition">¶</a></dt>
+<code class="descname">restore_state</code><span class="sig-paren">(</span><em>state</em>, <em>checkpoint</em><span class="sig-paren">)</span><a class="reference internal" href="modules/trainer.html#Trainer.restore_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#trainer.Trainer.restore_state" title="Permalink to this definition">¶</a></dt>
 <dd><p>Restore from checkpoint.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -261,7 +261,7 @@
 
 <dl class="method">
 <dt id="trainer.Trainer.terminate">
-<code class="descname">terminate</code><span class="sig-paren">(</span><em>raise_exception=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/trainer.html#Trainer.terminate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#trainer.Trainer.terminate" title="Permalink to this definition">¶</a></dt>
+<code class="descname">terminate</code><span class="sig-paren">(</span><em>raise_exception=True</em><span class="sig-paren">)</span><a class="reference internal" href="modules/trainer.html#Trainer.terminate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#trainer.Trainer.terminate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Terminate training process, trigger <cite>on_terminated</cite> event.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -276,7 +276,7 @@ default <cite>True</cite>.</td>
 
 <dl class="method">
 <dt id="trainer.Trainer.test">
-<code class="descname">test</code><span class="sig-paren">(</span><em>test_data_loader=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/trainer.html#Trainer.test"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#trainer.Trainer.test" title="Permalink to this definition">¶</a></dt>
+<code class="descname">test</code><span class="sig-paren">(</span><em>test_data_loader=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/trainer.html#Trainer.test"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#trainer.Trainer.test" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test model(test_data_loader needed).</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -290,7 +290,7 @@ default <cite>True</cite>.</td>
 
 <dl class="method">
 <dt id="trainer.Trainer.train">
-<code class="descname">train</code><span class="sig-paren">(</span><em>max_epoch</em>, <em>checkpoint=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/trainer.html#Trainer.train"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#trainer.Trainer.train" title="Permalink to this definition">¶</a></dt>
+<code class="descname">train</code><span class="sig-paren">(</span><em>max_epoch</em>, <em>checkpoint=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/trainer.html#Trainer.train"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#trainer.Trainer.train" title="Permalink to this definition">¶</a></dt>
 <dd><p>Train model with <cite>max_epoch</cite> epochs.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -308,7 +308,7 @@ default <cite>True</cite>.</td>
 
 <dl class="method">
 <dt id="trainer.Trainer.unregister_hook">
-<code class="descname">unregister_hook</code><span class="sig-paren">(</span><em>hook</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/trainer.html#Trainer.unregister_hook"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#trainer.Trainer.unregister_hook" title="Permalink to this definition">¶</a></dt>
+<code class="descname">unregister_hook</code><span class="sig-paren">(</span><em>hook</em><span class="sig-paren">)</span><a class="reference internal" href="modules/trainer.html#Trainer.unregister_hook"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#trainer.Trainer.unregister_hook" title="Permalink to this definition">¶</a></dt>
 <dd><p>Unregister a hook.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -322,7 +322,7 @@ default <cite>True</cite>.</td>
 
 <dl class="method">
 <dt id="trainer.Trainer.unregister_hooks">
-<code class="descname">unregister_hooks</code><span class="sig-paren">(</span><em>hooks</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/trainer.html#Trainer.unregister_hooks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#trainer.Trainer.unregister_hooks" title="Permalink to this definition">¶</a></dt>
+<code class="descname">unregister_hooks</code><span class="sig-paren">(</span><em>hooks</em><span class="sig-paren">)</span><a class="reference internal" href="modules/trainer.html#Trainer.unregister_hooks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#trainer.Trainer.unregister_hooks" title="Permalink to this definition">¶</a></dt>
 <dd><p>Unregister multiple hooks at the same time.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -336,7 +336,7 @@ default <cite>True</cite>.</td>
 
 <dl class="method">
 <dt id="trainer.Trainer.validate">
-<code class="descname">validate</code><span class="sig-paren">(</span><em>epochs=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/trainer.html#Trainer.validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#trainer.Trainer.validate" title="Permalink to this definition">¶</a></dt>
+<code class="descname">validate</code><span class="sig-paren">(</span><em>epochs=-1</em><span class="sig-paren">)</span><a class="reference internal" href="modules/trainer.html#Trainer.validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#trainer.Trainer.validate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Validate model(val_date_loader needed).</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -403,15 +403,15 @@ default <cite>True</cite>.</td>
             SOURCELINK_SUFFIX: '.txt'
         };
     </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="static/jquery.js"></script>
+      <script type="text/javascript" src="static/underscore.js"></script>
+      <script type="text/javascript" src="static/doctools.js"></script>
 
   
 
   
   
-    <script type="text/javascript" src="_static/js/theme.js"></script>
+    <script type="text/javascript" src="static/js/theme.js"></script>
   
 
   <script type="text/javascript">
