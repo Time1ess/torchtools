@@ -17,7 +17,7 @@ import torch.optim as optim
 
 from torchtools import VALIDATE_MODE
 from torchtools.meters import EPOCH_RESET, SCALAR_METER
-from torchtools.exceptions import EarlyStoppingError
+from torchtools.exceptions import EarlyStoppingException
 from torchtools.callbacks import (
     ModelCheckPoint, CSVLogger, EarlyStopping,
     LambdaLR, StepLR, MultiStepLR, ExponentialLR, ReduceLROnPlateau,
@@ -127,7 +127,7 @@ class TestEarlyStopping(unittest.TestCase):
         ret = early_stopping.on_epoch_end(trainer, state)
 
         state['meters']['val_loss'] = Mock(value=3)
-        with self.assertRaises(EarlyStoppingError):
+        with self.assertRaises(EarlyStoppingException):
             ret = early_stopping.on_epoch_end(trainer, state)
 
     def test_acc(self):
@@ -144,7 +144,7 @@ class TestEarlyStopping(unittest.TestCase):
         early_stopping.on_epoch_end(trainer, state)
 
         state['meters']['acc'] = Mock(value=3)
-        with self.assertRaises(EarlyStoppingError):
+        with self.assertRaises(EarlyStoppingException):
             early_stopping.on_epoch_end(trainer, state)
 
 
