@@ -6,8 +6,26 @@ from torchtools.meters import EPOCH_RESET, BATCH_RESET
 
 
 class TensorBoardLogger(Callback):
-    def __init__(self, log_dir=None, ignores=None, log_model_graph=False,
-                 comment='', log_param_interval=0, *args, **kwargs):
+    """Callback that logs epoch results to a TensorBoard file."""
+    def __init__(self, log_dir=None, comment='', ignores=None,
+                 log_model_graph=False, log_param_interval=0, *args, **kwargs):
+        """Initialization for TensorBoardLogger.
+
+        Parameters
+        ----------
+        log_dir: str
+            Path to save tensorboard file,
+            Default: 'runs/{fmt_datetime}_{hostname}{comment}'.
+        comment: str
+            Comment that appends to the log_dir. Default: ''.
+        ignores: list
+            A list of names will be not logged. Default: None.
+        log_model_graph: bool
+            Whether to save model graph definition. Default: False.
+        log_param_interlval: int
+            Number of epochs between logging parameters histogram.
+            Default: 0(No log).
+        """
         super(TensorBoardLogger, self).__init__(*args, **kwargs)
         self.writer = SummaryWriter(log_dir, comment=comment)
         if ignores is None:

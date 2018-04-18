@@ -10,10 +10,37 @@ from torchtools.callbacks.callback import Callback
 
 
 class ModelCheckPoint(Callback):
+    """Callback that saves model checkpoint.
+
+    This callback will save current training state to save_dir/fname.
+    """
     def __init__(self, save_dir=None,
                  fname='{arch}_{epochs:05d}_{val_loss:.2f}.pt',
                  monitor='val_loss', mode='auto', period=1,
                  save_best_only=True):
+        """Initialization for ModelCheckPoint.
+
+        Parameters
+        ----------
+        save_dir: str
+            Path to save checkpoint. Default: 'checkpoints'.
+        fname: str
+            Filename to save checkpoint,
+            Default: '{arch}_{epochs:05d}_{val_loss:.2f}.pt'.
+        monitor: str
+            Value to be monitored. Default: 'val_loss'.
+        mode: str
+            One of 'max', 'min' and 'auto'. Default: 'auto'.
+            If save_best_only is True, this will decide whether a better
+            result has been gotten. For 'acc' and 'val_acc', mode should be
+            'max', for 'loss' and 'val_loss', mode should be 'min', if 'auto',
+            the 'max' or 'min' will be inferred from monitor.
+        period: int
+            How often to save checkpoints. Default: 1.
+        save_best_only: bool
+            If True, Only the best model will be saved,
+            otherwise the model will be saved every period. Default: True.
+        """
         if not save_dir:
             save_dir = 'checkpoints'
         if not os.path.exists(save_dir):

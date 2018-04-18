@@ -8,15 +8,37 @@ from torchtools.callbacks.callback import Callback
 
 
 class CSVLogger(Callback):
+    """Callback that logs epoch results to a CSV file."""
     def __init__(self, log_dir=None, comment='', separator=',',
                  keys=None, header=True, timestamp=True, datetime_fmt=None):
+        """Initialization for CSVLogger.
+
+        Parameters
+        ----------
+        log_dir: str
+            Path to save csv file,
+            Default: 'logs/{fmt_datetime}_{hostname}{comment}'.
+        comment: str
+            Comment that appends to the log_dir. Default: ''.
+        separator: str
+            Character used to separate elements in CSV file. Default: ','.
+        keys: list or tuple
+            Values should be logged. Default: None.
+        header: bool
+            Whether to include header in CSV file. Default: True.
+        timestamp: bool
+            Whether to include timestamp for every row. Default: True.
+        datetime_fmt: str
+            String used to format datetime timestamp. Default: None.
+        """
         super(CSVLogger, self).__init__()
         if not log_dir:
             import socket
             from datetime import datetime
             now = datetime.now().strftime('%b%d_%H-%M-%S')
             hostname = socket.gethostname()
-            log_dir = os.path.join('logs', now + '_' + hostname + comment)
+            log_dir = os.path.join('logs', now + '_' + hostname)
+        log_dir += comment
         if not os.path.exists(log_dir):
             os.makedirs(log_dir)
         self.fpath = os.path.join(log_dir, 'training_log.csv')

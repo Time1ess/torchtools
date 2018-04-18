@@ -1,17 +1,8 @@
-#!/usr/local/bin/python3
 # coding: UTF-8
-# Author: David
-# Email: youchen.du@gmail.com
-# Created: 2017-08-14 21:23
-# Last modified: 2017-10-17 21:19
-# Filename: callback.py
-# Description:
 
 
 class Hook(object):
-    """
-    Abstract class.
-    """
+    """Base class for all callbacks and meters"""
     def on_train_start(self, trainer, state):
         pass
 
@@ -56,6 +47,7 @@ class Hook(object):
 
 
 class Callback(Hook):
+    """Base class for all callbacks."""
     def _callback_check(self, trainer):
         pass
 
