@@ -29,7 +29,7 @@
   <link rel="stylesheet" href="static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="1. Trainer" href="trainer.html" /> 
+    <link rel="next" title="Home" href="home.html" /> 
 
   
   <script src="static/js/modernizr.min.js"></script>
@@ -85,10 +85,13 @@
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Welcome to torchtools’s documentation!</a></li>
-<li class="toctree-l1"><a class="reference internal" href="trainer.html">1. Trainer</a></li>
-<li class="toctree-l1"><a class="reference internal" href="callbacks.html">2. Callbacks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="meters.html">3. Meters</a></li>
-<li class="toctree-l1"><a class="reference internal" href="exceptions.html">4. Exceptions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="home.html">Home</a></li>
+<li class="toctree-l1"><a class="reference internal" href="trainer.html">Trainer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="callbacks.html">Callbacks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="meters.html">Meters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exceptions.html">Exceptions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acknoledgement.html">Acknoledgement</a></li>
 </ul>
 
             
@@ -155,54 +158,61 @@
             
   <div class="section" id="welcome-to-torchtools-s-documentation">
 <h1>Welcome to torchtools’s documentation!<a class="headerlink" href="#welcome-to-torchtools-s-documentation" title="Permalink to this headline">¶</a></h1>
+<a class="reference external image-reference" href="https://travis-ci.org/Time1ess/torchtools"><img alt="https://travis-ci.org/Time1ess/torchtools.svg?branch=master" src="https://travis-ci.org/Time1ess/torchtools.svg?branch=master" /></a>
+<a class="reference external image-reference" href="https://github.com/Time1ess/torchtools/blob/master/LICENSE"><img alt="https://img.shields.io/badge/License-BSD%203--Clause-blue.svg" src="https://img.shields.io/badge/License-BSD%203--Clause-blue.svg" /></a>
+<a class="reference external image-reference" href="https://Time1ess.github.io/torchtools"><img alt="https://img.shields.io/badge/docs-link-green.svg" src="https://img.shields.io/badge/docs-link-green.svg" /></a>
 <div class="toctree-wrapper compound">
 <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Welcome to torchtools’s documentation!</a></li>
-<li class="toctree-l1"><a class="reference internal" href="trainer.html">1. Trainer</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="trainer.html#id1">1.1. Trainer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="home.html">Home</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="home.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="home.html#features">Features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="home.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="home.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="home.html#screenshots">Screenshots</a></li>
+<li class="toctree-l2"><a class="reference internal" href="home.html#minute-torchtools-mnist-example">1 Minute torchtools MNIST example</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="callbacks.html">2. Callbacks</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="callbacks.html#hook">2.1. Hook</a></li>
-<li class="toctree-l2"><a class="reference internal" href="callbacks.html#callback">2.2. Callback</a></li>
-<li class="toctree-l2"><a class="reference internal" href="callbacks.html#modelcheckpoint">2.3. ModelCheckPoint</a></li>
-<li class="toctree-l2"><a class="reference internal" href="callbacks.html#csvlogger">2.4. CSVLogger</a></li>
-<li class="toctree-l2"><a class="reference internal" href="callbacks.html#earlystopping">2.5. EarlyStopping</a></li>
-<li class="toctree-l2"><a class="reference internal" href="callbacks.html#lambdalr">2.6. LambdaLR</a></li>
-<li class="toctree-l2"><a class="reference internal" href="callbacks.html#steplr">2.7. StepLR</a></li>
-<li class="toctree-l2"><a class="reference internal" href="callbacks.html#multisteplr">2.8. MultiStepLR</a></li>
-<li class="toctree-l2"><a class="reference internal" href="callbacks.html#exponentiallr">2.9. ExponentialLR</a></li>
-<li class="toctree-l2"><a class="reference internal" href="callbacks.html#reducelronplateau">2.10. ReduceLROnPlateau</a></li>
-<li class="toctree-l2"><a class="reference internal" href="callbacks.html#tensorboardlogger">2.11. TensorBoardLogger</a></li>
+<li class="toctree-l1"><a class="reference internal" href="trainer.html">Trainer</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="trainer.html#id1">Trainer</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="meters.html">3. Meters</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="meters.html#meter">3.1. Meter</a></li>
-<li class="toctree-l2"><a class="reference internal" href="meters.html#epochmeter">3.2. EpochMeter</a></li>
-<li class="toctree-l2"><a class="reference internal" href="meters.html#averagemeter">3.3. AverageMeter</a></li>
-<li class="toctree-l2"><a class="reference internal" href="meters.html#accuracymeter">3.4. AccuracyMeter</a></li>
-<li class="toctree-l2"><a class="reference internal" href="meters.html#errormeter">3.5. ErrorMeter</a></li>
-<li class="toctree-l2"><a class="reference internal" href="meters.html#lossmeter">3.6. LossMeter</a></li>
-<li class="toctree-l2"><a class="reference internal" href="meters.html#timemeter">3.7. TimeMeter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="callbacks.html">Callbacks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="callbacks.html#hook">Hook</a></li>
+<li class="toctree-l2"><a class="reference internal" href="callbacks.html#callback">Callback</a></li>
+<li class="toctree-l2"><a class="reference internal" href="callbacks.html#modelcheckpoint">ModelCheckPoint</a></li>
+<li class="toctree-l2"><a class="reference internal" href="callbacks.html#csvlogger">CSVLogger</a></li>
+<li class="toctree-l2"><a class="reference internal" href="callbacks.html#earlystopping">EarlyStopping</a></li>
+<li class="toctree-l2"><a class="reference internal" href="callbacks.html#lambdalr">LambdaLR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="callbacks.html#steplr">StepLR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="callbacks.html#multisteplr">MultiStepLR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="callbacks.html#exponentiallr">ExponentialLR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="callbacks.html#reducelronplateau">ReduceLROnPlateau</a></li>
+<li class="toctree-l2"><a class="reference internal" href="callbacks.html#tensorboardlogger">TensorBoardLogger</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="exceptions.html">4. Exceptions</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="exceptions.html#hooktypeerror">4.1. HookTypeError</a></li>
-<li class="toctree-l2"><a class="reference internal" href="exceptions.html#callbackcheckerror">4.2. CallbackCheckError</a></li>
-<li class="toctree-l2"><a class="reference internal" href="exceptions.html#trainerterminatedexception">4.3. TrainerTerminatedException</a></li>
-<li class="toctree-l2"><a class="reference internal" href="exceptions.html#earlystoppingexception">4.4. EarlyStoppingException</a></li>
+<li class="toctree-l1"><a class="reference internal" href="meters.html">Meters</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="meters.html#meter">Meter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="meters.html#epochmeter">EpochMeter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="meters.html#averagemeter">AverageMeter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="meters.html#accuracymeter">AccuracyMeter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="meters.html#errormeter">ErrorMeter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="meters.html#lossmeter">LossMeter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="meters.html#timemeter">TimeMeter</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="exceptions.html">Exceptions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="exceptions.html#hooktypeerror">HookTypeError</a></li>
+<li class="toctree-l2"><a class="reference internal" href="exceptions.html#callbackcheckerror">CallbackCheckError</a></li>
+<li class="toctree-l2"><a class="reference internal" href="exceptions.html#trainerterminatedexception">TrainerTerminatedException</a></li>
+<li class="toctree-l2"><a class="reference internal" href="exceptions.html#earlystoppingexception">EarlyStoppingException</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acknoledgement.html">Acknoledgement</a></li>
 </ul>
 </div>
-</div>
-<div class="section" id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
-<ul class="simple">
-<li><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></li>
-<li><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></li>
-</ul>
 </div>
 
 
@@ -213,7 +223,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="trainer.html" class="btn btn-neutral float-right" title="1. Trainer" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="home.html" class="btn btn-neutral float-right" title="Home" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
     </div>

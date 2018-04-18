@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>3. Meters &mdash; torchtools 0.1.3 documentation</title>
+  <title>Meters &mdash; torchtools 0.1.3 documentation</title>
   
 
   
@@ -29,8 +29,8 @@
   <link rel="stylesheet" href="static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="4. Exceptions" href="exceptions.html" />
-    <link rel="prev" title="2. Callbacks" href="callbacks.html" /> 
+    <link rel="next" title="Exceptions" href="exceptions.html" />
+    <link rel="prev" title="Callbacks" href="callbacks.html" /> 
 
   
   <script src="static/js/modernizr.min.js"></script>
@@ -86,19 +86,22 @@
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="index.html">Welcome to torchtools’s documentation!</a></li>
-<li class="toctree-l1"><a class="reference internal" href="trainer.html">1. Trainer</a></li>
-<li class="toctree-l1"><a class="reference internal" href="callbacks.html">2. Callbacks</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">3. Meters</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#meter">3.1. Meter</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#epochmeter">3.2. EpochMeter</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#averagemeter">3.3. AverageMeter</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#accuracymeter">3.4. AccuracyMeter</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#errormeter">3.5. ErrorMeter</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#lossmeter">3.6. LossMeter</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#timemeter">3.7. TimeMeter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="home.html">Home</a></li>
+<li class="toctree-l1"><a class="reference internal" href="trainer.html">Trainer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="callbacks.html">Callbacks</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Meters</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#meter">Meter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#epochmeter">EpochMeter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#averagemeter">AverageMeter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#accuracymeter">AccuracyMeter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#errormeter">ErrorMeter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#lossmeter">LossMeter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#timemeter">TimeMeter</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="exceptions.html">4. Exceptions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exceptions.html">Exceptions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acknoledgement.html">Acknoledgement</a></li>
 </ul>
 
             
@@ -144,7 +147,7 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>3. Meters</li>
+      <li>Meters</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -164,9 +167,21 @@
            <div itemprop="articleBody">
             
   <div class="section" id="meters">
-<h1>3. Meters<a class="headerlink" href="#meters" title="Permalink to this headline">¶</a></h1>
+<h1>Meters<a class="headerlink" href="#meters" title="Permalink to this headline">¶</a></h1>
+<p><strong>meters</strong> are provided to measure loss, accuracy, error rate, time in different ways.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torchtools.meters</span> <span class="k">import</span> <span class="n">LossMeter</span><span class="p">,</span> <span class="n">AccuracyMeter</span>
+
+<span class="n">loss_meter</span> <span class="o">=</span> <span class="n">LossMeter</span><span class="p">(</span><span class="s1">&#39;loss&#39;</span><span class="p">)</span>
+<span class="n">val_loss_meter</span> <span class="o">=</span> <span class="n">LossMeter</span><span class="p">(</span><span class="s1">&#39;val_loss&#39;</span><span class="p">))</span>
+<span class="n">val_acc_meter</span> <span class="o">=</span> <span class="n">AccuracyMeter</span><span class="p">(</span><span class="s1">&#39;val_acc&#39;</span><span class="p">)</span>
+
+<span class="o">...</span>
+
+<span class="n">trainer</span><span class="o">.</span><span class="n">register_hooks</span><span class="p">([</span><span class="n">loss_meter</span><span class="p">,</span> <span class="n">val_loss_meter</span><span class="p">,</span> <span class="n">val_acc_meter</span><span class="p">])</span>
+</pre></div>
+</div>
 <div class="section" id="meter">
-<h2>3.1. Meter<a class="headerlink" href="#meter" title="Permalink to this headline">¶</a></h2>
+<h2>Meter<a class="headerlink" href="#meter" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="meters.meter.Meter">
 <em class="property">class </em><code class="descclassname">meters.meter.</code><code class="descname">Meter</code><span class="sig-paren">(</span><em>name</em>, <em>alias=None</em>, <em>scaling=1</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="modules/meters/meter.html#Meter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#meters.meter.Meter" title="Permalink to this definition">¶</a></dt>
@@ -201,7 +216,7 @@
 
 </div>
 <div class="section" id="epochmeter">
-<h2>3.2. EpochMeter<a class="headerlink" href="#epochmeter" title="Permalink to this headline">¶</a></h2>
+<h2>EpochMeter<a class="headerlink" href="#epochmeter" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="meters.meter.EpochMeter">
 <em class="property">class </em><code class="descclassname">meters.meter.</code><code class="descname">EpochMeter</code><span class="sig-paren">(</span><em>name</em>, <em>alias=None</em>, <em>scaling=1</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="modules/meters/meter.html#EpochMeter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#meters.meter.EpochMeter" title="Permalink to this definition">¶</a></dt>
@@ -210,7 +225,7 @@
 
 </div>
 <div class="section" id="averagemeter">
-<h2>3.3. AverageMeter<a class="headerlink" href="#averagemeter" title="Permalink to this headline">¶</a></h2>
+<h2>AverageMeter<a class="headerlink" href="#averagemeter" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="meters.meter.AverageMeter">
 <em class="property">class </em><code class="descclassname">meters.meter.</code><code class="descname">AverageMeter</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="modules/meters/meter.html#AverageMeter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#meters.meter.AverageMeter" title="Permalink to this definition">¶</a></dt>
@@ -231,7 +246,7 @@
 
 </div>
 <div class="section" id="accuracymeter">
-<h2>3.4. AccuracyMeter<a class="headerlink" href="#accuracymeter" title="Permalink to this headline">¶</a></h2>
+<h2>AccuracyMeter<a class="headerlink" href="#accuracymeter" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="meters.accmeter.AccuracyMeter">
 <em class="property">class </em><code class="descclassname">meters.accmeter.</code><code class="descname">AccuracyMeter</code><span class="sig-paren">(</span><em>name</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="modules/meters/accmeter.html#AccuracyMeter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#meters.accmeter.AccuracyMeter" title="Permalink to this definition">¶</a></dt>
@@ -246,7 +261,7 @@
 
 </div>
 <div class="section" id="errormeter">
-<h2>3.5. ErrorMeter<a class="headerlink" href="#errormeter" title="Permalink to this headline">¶</a></h2>
+<h2>ErrorMeter<a class="headerlink" href="#errormeter" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="meters.accmeter.ErrorMeter">
 <em class="property">class </em><code class="descclassname">meters.accmeter.</code><code class="descname">ErrorMeter</code><span class="sig-paren">(</span><em>name</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="modules/meters/accmeter.html#ErrorMeter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#meters.accmeter.ErrorMeter" title="Permalink to this definition">¶</a></dt>
@@ -261,7 +276,7 @@
 
 </div>
 <div class="section" id="lossmeter">
-<h2>3.6. LossMeter<a class="headerlink" href="#lossmeter" title="Permalink to this headline">¶</a></h2>
+<h2>LossMeter<a class="headerlink" href="#lossmeter" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="meters.lossmeter.LossMeter">
 <em class="property">class </em><code class="descclassname">meters.lossmeter.</code><code class="descname">LossMeter</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="modules/meters/lossmeter.html#LossMeter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#meters.lossmeter.LossMeter" title="Permalink to this definition">¶</a></dt>
@@ -270,7 +285,7 @@
 
 </div>
 <div class="section" id="timemeter">
-<h2>3.7. TimeMeter<a class="headerlink" href="#timemeter" title="Permalink to this headline">¶</a></h2>
+<h2>TimeMeter<a class="headerlink" href="#timemeter" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="meters.timemeter.TimeMeter">
 <em class="property">class </em><code class="descclassname">meters.timemeter.</code><code class="descname">TimeMeter</code><span class="sig-paren">(</span><em>name</em>, <em>alias=None</em>, <em>scaling=1</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="modules/meters/timemeter.html#TimeMeter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#meters.timemeter.TimeMeter" title="Permalink to this definition">¶</a></dt>
@@ -294,10 +309,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="exceptions.html" class="btn btn-neutral float-right" title="4. Exceptions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="exceptions.html" class="btn btn-neutral float-right" title="Exceptions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="callbacks.html" class="btn btn-neutral" title="2. Callbacks" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="callbacks.html" class="btn btn-neutral" title="Callbacks" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

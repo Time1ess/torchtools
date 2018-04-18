@@ -2,12 +2,13 @@
 
 [![Build Status](https://travis-ci.org/Time1ess/torchtools.svg?branch=master)](https://travis-ci.org/Time1ess/torchtools)
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://github.com/Time1ess/torchtools/blob/master/LICENSE)
+[![Docs](https://img.shields.io/badge/docs-link-green.svg)](https://Time1ess.github.io/torchtools)
 
 ---
 
 torchtools is a High-Level training API on top of [PyTorch](http://pytorch.org) with many useful features to simplifiy the traing process for users.
 
-It was developed based on ideas from [tnt](https://github.com/pytorch/tnt), [Keras](https://github.com/fchollet/keras). I wrote this tool just want to repeat myself, since many different training tasks share same training routine(define dataset, retrieve a batch of samples, forward propagation, backward propagation, ...).
+It was developed based on ideas from [tnt](https://github.com/pytorch/tnt), [Keras](https://github.com/fchollet/keras). I wrote this tool just want to release myself, since many different training tasks share same training routine(define dataset, retrieve a batch of samples, forward propagation, backward propagation, ...).
 
 This API provides these follows:
 
@@ -22,15 +23,17 @@ This API provides these follows:
 * Numpy
 * [PyTorch](http://pytorch.org)
 * [tensorboardX](https://github.com/lanpa/tensorboard-pytorch)
-* [Standalone TensorBoard](https://github.com/dmlc/tensorboard)
+* [Standalone TensorBoard](https://github.com/dmlc/tensorboard)(Optional)
 
-## Install
+## Installation
 
-torchtools has been tested on **Python 2.7+**, **Python 3**.
+torchtools has been tested on **Python 2.7+**, **Python 3.5+**.
+
+Windows is not supported since PyTorch is only supported on Linux and OSX.
 
 `pip install torchtools`
 
-## Show
+## Screenshots
 
 Training Process:
 
@@ -109,18 +112,6 @@ trainer.register_hooks([
 trainer.train(EPOCHS)
 ```
 
-### Meters
-
-`meters` are provided to measure `loss`, `accuracy`, `time` in different ways.
-
-```Python
-from torchtools.meters import LossMeter, AccuracyMeter
-
-loss_meter = LossMeter('loss')
-val_loss_meter = LossMeter('val_loss'))
-acc_meter = AccuracyMeter('acc')
-```
-
 ### Callbacks
 
 `callbacks` provides samilar API compared with [Keras](https://github.com/fchollet/keras). We can have more control on our training process through `callbacks`.
@@ -137,16 +128,28 @@ logger = TensorBoardLogger(comment=name)
 trainer.register_hooks([scheduler, reduce_lr, logger])
 ```
 
+### Meters
+
+`meters` are provided to measure `loss`, `accuracy`, `time` in different ways.
+
+```Python
+from torchtools.meters import LossMeter, AccuracyMeter
+
+loss_meter = LossMeter('loss')
+val_loss_meter = LossMeter('val_loss'))
+acc_meter = AccuracyMeter('acc')
+```
+
 ### Put together
 
 Now, we can put it together.
 
 1. Instantiate a `Trainer` object with `Model`, `Dataloader for trainset`, `Criterion`, `Optimizer`, and other optional arguments.
 2. All `callbacks` and `meters` are actually `Hook` objects, so we can use `register_hooks` to register these hooks to `ModelTrainer`.
-3. Call `train` with training epochs.
+3. Call `.train(epochs)` on `Trainer` with training epochs.
 4. Done!
 
-## Contribute
+## Contributing
 
 Please feel free to add more features!
 

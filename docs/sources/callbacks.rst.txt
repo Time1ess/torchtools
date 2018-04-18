@@ -1,6 +1,22 @@
 Callbacks
 =============================
 
+**callbacks** provides samilar API compared with Keras_. We can have more control on our training process through callbacks.
+
+.. _Keras: https://github.com/fchollet/keras
+
+::
+
+    from torchtools.callbacks import StepLR, ReduceLROnPlateau, TensorBoardLogger
+    
+    scheduler = StepLR(optimizer, 1, gamma=0.95)
+    reduce_lr = ReduceLROnPlateau(optimizer, 'val_loss', factor=0.3, patience=3)
+    logger = TensorBoardLogger(comment=name)
+    
+    ...
+    
+    trainer.register_hooks([scheduler, reduce_lr, logger])
+
 Hook
 --------------------------------------
 
