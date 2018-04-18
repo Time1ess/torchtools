@@ -3,6 +3,7 @@ from torchtools.meters import EpochMeter, SCALAR_METER
 
 
 class AccuracyMeter(EpochMeter):
+    """Meter that measures average accuracy for epoch."""
     meter_type = SCALAR_METER
 
     def __init__(self, name, *args, **kwargs):
@@ -32,6 +33,7 @@ class AccuracyMeter(EpochMeter):
 
 
 class ErrorMeter(AccuracyMeter):
+    """Meter that measures average error rate for epoch."""
     @property
     def value(self):
         return self.scaling * (1. - 1. * self.correct_cnt / self.total_cnt)

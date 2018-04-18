@@ -5,6 +5,7 @@ from torchtools.meters import EpochMeter, SCALAR_METER
 
 
 class TimeMeter(EpochMeter):
+    """Meter that measures elapsed time for epoch."""
     meter_type = SCALAR_METER
 
     def on_epoch_start(self, trainer, state):
