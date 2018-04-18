@@ -2,32 +2,25 @@
 
 
 class TorchToolsException(Exception):
+    """Base class for all exceptions in torchtools"""
     pass
 
 
 class HookTypeError(TorchToolsException):
+    """Invalid Hook type error"""
     pass
 
 
 class CallbackCheckError(TorchToolsException):
+    """Callback check failed error"""
     pass
 
 
-class TrainerTerminated(TorchToolsException):
+class TrainerTerminatedException(TorchToolsException):
+    """Trainer terminated exception"""
     pass
 
 
-class MeterNotFoundError(TorchToolsException):
-    pass
-
-
-class MeterNoValueError(TorchToolsException):
-    pass
-
-
-class LogTypeError(TorchToolsException):
-    pass
-
-
-class EarlyStoppingError(TorchToolsException):
+class EarlyStoppingException(TorchToolsException):
+    """Early stopping exception"""
     pass
