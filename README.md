@@ -29,8 +29,6 @@ This API provides these follows:
 
 torchtools has been tested on **Python 2.7+**, **Python 3.5+**.
 
-Windows is not supported since PyTorch is only supported on Linux and OSX.
-
 `pip install torchtools`
 
 ## Screenshots
