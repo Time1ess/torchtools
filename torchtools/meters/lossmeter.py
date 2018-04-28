@@ -7,4 +7,4 @@ class LossMeter(AverageMeter):
         if state['mode'] != self.mode:
             return
         if self.name in state:
-            self.add(state[self.name].data[0])
+            self.add(state[self.name])

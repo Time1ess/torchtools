@@ -166,11 +166,11 @@
 <h2>Trainer<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="trainer.Trainer">
-<em class="property">class </em><code class="descclassname">trainer.</code><code class="descname">Trainer</code><span class="sig-paren">(</span><em>model</em>, <em>train_data_loader</em>, <em>criterion</em>, <em>optimizer</em>, <em>val_data_loader=None</em>, <em>test_data_loader=None</em>, <em>use_cuda=True</em>, <em>device_id=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/trainer.html#Trainer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#trainer.Trainer" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">trainer.</code><code class="descname">Trainer</code><span class="sig-paren">(</span><em>model</em>, <em>train_data_loader</em>, <em>criterion</em>, <em>optimizer</em>, <em>val_data_loader=None</em>, <em>test_data_loader=None</em>, <em>device='cpu'</em><span class="sig-paren">)</span><a class="reference internal" href="modules/trainer.html#Trainer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#trainer.Trainer" title="Permalink to this definition">¶</a></dt>
 <dd><p>A class to handle the whole training, validating and testing process</p>
 <dl class="method">
 <dt id="trainer.Trainer.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>model</em>, <em>train_data_loader</em>, <em>criterion</em>, <em>optimizer</em>, <em>val_data_loader=None</em>, <em>test_data_loader=None</em>, <em>use_cuda=True</em>, <em>device_id=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/trainer.html#Trainer.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#trainer.Trainer.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>model</em>, <em>train_data_loader</em>, <em>criterion</em>, <em>optimizer</em>, <em>val_data_loader=None</em>, <em>test_data_loader=None</em>, <em>device='cpu'</em><span class="sig-paren">)</span><a class="reference internal" href="modules/trainer.html#Trainer.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#trainer.Trainer.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Instantiate a trainer object.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -183,8 +183,8 @@
 <li><strong>optimizer</strong> (<em>torch.optim.Optimizer</em>) – Optimizer responsible for optimizing model</li>
 <li><strong>val_data_loader</strong><strong>(</strong><strong>optional</strong><strong>)</strong> (<em>torch.utils.data.DataLoader</em>) – An instance of DataLoader to load validate data.</li>
 <li><strong>test_data_loader</strong><strong>(</strong><strong>optional</strong><strong>)</strong> (<em>torch.utils.data.DataLoader</em>) – An instance of DataLoader to load test data.</li>
-<li><strong>use_cuda</strong> (<em>bool</em>) – Whether to use GPU, default <cite>True</cite>.</li>
-<li><strong>device_id</strong> (<em>int</em>) – Which GPU should be used if use_cuda is True, default <cite>None</cite>.</li>
+<li><strong>device</strong> (<em>str</em>) – Which device should be used if use_cuda is True, should be
+formatted like ‘cuda:0’ or ‘cpu’. Default: ‘cpu’.</li>
 </ul>
 </td>
 </tr>

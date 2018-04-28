@@ -28,10 +28,11 @@ Requirements
 
 * tqdm
 * Numpy
-* PyTorch_
+* `PyTorchv0.4.0+`_
 * tensorboardX_
 * `Standalone TensorBoard`_ (Optional)
 
+.. _`PyTorchv0.4.0+`: http://pytorch.org
 .. _tensorboardX: https://github.com/lanpa/tensorboard-pytorch
 .. _`Standalone TensorBoard`: https://github.com/dmlc/tensorboard
 

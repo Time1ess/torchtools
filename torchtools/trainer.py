@@ -1,7 +1,6 @@
 # coding: UTF-8
 import torch
 
-from torch.autograd import Variable
 from tqdm import tqdm, trange
 
 from torchtools import TRAIN_MODE, VALIDATE_MODE, TEST_MODE
@@ -25,7 +24,7 @@ class Trainer(object):
 
     def __init__(self, model, train_data_loader, criterion, optimizer,
                  val_data_loader=None, test_data_loader=None,
-                 use_cuda=True, device_id=None):
+                 device='cpu'):
         """
         Instantiate a trainer object.
 
@@ -43,10 +42,9 @@ class Trainer(object):
             An instance of DataLoader to load validate data.
         test_data_loader(optional): torch.utils.data.DataLoader
             An instance of DataLoader to load test data.
-        use_cuda: bool
-            Whether to use GPU, default `True`.
-        device_id: int
-            Which GPU should be used if use_cuda is True, default `None`.
+        device: str
+            Which device should be used if use_cuda is True, should be
+            formatted like 'cuda:0' or 'cpu'. Default: 'cpu'.
         """
         self.model = model
         self.train_data_loader = train_data_loader
@@ -54,8 +52,7 @@ class Trainer(object):
         self.optimizer = optimizer
         self.val_data_loader = val_data_loader
         self.test_data_loader = test_data_loader
-        self.device_id = device_id
-        self.use_cuda = use_cuda and torch.cuda.is_available()
+        self.device = torch.device(device)
 
         self.callback_hooks = {k: [] for k in self.hook_entries}
         self.meter_hooks = {k: [] for k in self.hook_entries}
@@ -206,8 +203,7 @@ class Trainer(object):
         criterion = self.criterion
         optimizer = self.optimizer
         meters = self.meters
-        use_cuda = self.use_cuda
-        device_id = self.device_id
+        device = self.device
         self.trainer_ended = False
 
         state = {
@@ -225,51 +221,46 @@ class Trainer(object):
         self.notify_registered_hooks('on_train_start', state)
         iter_epoch = trange(max_epoch, initial=state['epochs'], unit='epoch')
         iter_epoch.set_description('Train')
-        for epoch in iter_epoch:
-            model.train(True)
-            state['epochs'] = epoch + 1
-            self.notify_registered_hooks('on_epoch_start', state)
+        with torch.set_grad_enabled(True):
+            for epoch in iter_epoch:
+                model = self.model.train(True)
+                state['epochs'] = epoch + 1
+                self.notify_registered_hooks('on_epoch_start', state)
 
-            iter_data = tqdm(data_loader, unit=' batches')
-            iter_data.set_description('Epoch ' + str(epoch))
-            for batch in iter_data:
-                input, target = batch[0], batch[1]
-                state['iters'] += 1
-                state['input'] = input
-                state['target'] = target
-                self.notify_registered_hooks('on_batch_start', state)
+                iter_data = tqdm(data_loader, unit=' batches')
+                iter_data.set_description('Epoch ' + str(epoch))
+                for batch in iter_data:
+                    input, target = batch[0], batch[1]
+                    state['iters'] += 1
+                    state['input'] = input
+                    state['target'] = target
+                    self.notify_registered_hooks('on_batch_start', state)
 
-                if use_cuda:
-                    input = input.cuda(device_id, async=True)
-                    target = target.cuda(device_id, async=True)
-                input = Variable(input)
-                target = Variable(target)
+                    input, target = input.to(device), target.to(device)
 
-                def closure():
-                    state['optimizer'].zero_grad()
-                    output = state['model'](input)
-                    loss = criterion(output, target)
-                    iter_data.set_postfix(iters=state['iters'],
-                                          loss=loss.data[0])
-                    state['output'] = output
-                    state['loss'] = loss
-                    self.notify_registered_hooks('on_forward_end', state)
-                    loss.backward()
-                    self.notify_registered_hooks('on_backward_end', state)
-                    # Free memory
-                    state['output'] = None
-                    state['loss'] = None
-                    return loss
+                    def closure():
+                        state['optimizer'].zero_grad()
+                        output = state['model'](input)
+                        loss = criterion(output, target)
+                        loss_val = loss.item()
+                        iter_data.set_postfix(iters=state['iters'],
+                                              loss=loss_val)
+                        state['loss'] = loss_val
+                        state['output'] = output
+                        self.notify_registered_hooks('on_forward_end', state)
+                        loss.backward()
+                        self.notify_registered_hooks('on_backward_end', state)
+                        return loss
 
-                state['optimizer'].step(closure)
-                self.notify_registered_hooks('on_batch_end', state)
+                    state['optimizer'].step(closure)
+                    self.notify_registered_hooks('on_batch_end', state)
+                    if self.trainer_ended:
+                        break
+                self.notify_registered_hooks('on_epoch_end', state)
                 if self.trainer_ended:
                     break
-            self.notify_registered_hooks('on_epoch_end', state)
-            if self.trainer_ended:
-                break
-        self.trainer_ended = True
-        self.notify_registered_hooks('on_train_end', state)
+            self.trainer_ended = True
+            self.notify_registered_hooks('on_train_end', state)
         return state
 
     def validate(self, epochs=-1):
@@ -287,8 +278,7 @@ class Trainer(object):
         data_loader = self.val_data_loader
         criterion = self.criterion
         meters = self.meters
-        use_cuda = self.use_cuda
-        device_id = self.device_id
+        device = self.device
 
         state = {
             'model': model,
@@ -301,34 +291,29 @@ class Trainer(object):
         self.notify_registered_hooks('on_validate_start', state)
         iter_data = tqdm(data_loader, unit=' batches')
         iter_data.set_description('Validate')
-        for batch in iter_data:
-            input, target = batch[0], batch[1]
-            state['iters'] += 1
-            state['input'] = input
-            state['target'] = target
-            self.notify_registered_hooks('on_batch_start', state)
+        with torch.set_grad_enabled(False):
+            for batch in iter_data:
+                input, target = batch[0], batch[1]
+                state['iters'] += 1
+                state['input'] = input
+                state['target'] = target
+                self.notify_registered_hooks('on_batch_start', state)
 
-            if use_cuda:
-                input = input.cuda(device_id, async=True)
-                target = target.cuda(device_id, async=True)
-            input = Variable(input, volatile=True)
-            target = Variable(target, volatile=True)
+                input, target = input.to(device), target.to(device)
 
-            def closure():
-                output = state['model'](input)
-                loss = criterion(output, target)
-                iter_data.set_postfix(loss=loss.data[0])
-                state['output'] = output
-                state['val_loss'] = loss
-                self.notify_registered_hooks('on_forward_end', state)
-                # Free memory
-                state['output'] = None
-                state['val_loss'] = None
-                return loss
+                def closure():
+                    output = state['model'](input)
+                    loss = criterion(output, target)
+                    loss_val = loss.item()
+                    iter_data.set_postfix(loss=loss_val)
+                    state['output'] = output
+                    state['val_loss'] = loss_val
+                    self.notify_registered_hooks('on_forward_end', state)
+                    return loss
 
-            closure()
-            self.notify_registered_hooks('on_batch_end', state)
-        self.notify_registered_hooks('on_validate_end', state)
+                closure()
+                self.notify_registered_hooks('on_batch_end', state)
+            self.notify_registered_hooks('on_validate_end', state)
         return state
 
     def test(self, test_data_loader=None):
@@ -342,15 +327,14 @@ class Trainer(object):
         """
         if test_data_loader is None and self.test_data_loader is None:
             return {}
-        model = self.model.train(False)
         if test_data_loader:
             data_loader = test_data_loader
         else:
             data_loader = self.test_data_loader
+        model = self.model.train(False)
         criterion = self.criterion
         meters = self.meters
-        use_cuda = self.use_cuda
-        device_id = self.device_id
+        device = self.device
 
         state = {
             'model': model,
@@ -362,32 +346,27 @@ class Trainer(object):
         self.notify_registered_hooks('on_test_start', state)
         iter_data = tqdm(data_loader, unit=' batches')
         iter_data.set_description('Test')
-        for batch in iter_data:
-            input, target = batch[0], batch[1]
-            state['iters'] += 1
-            state['input'] = input
-            state['target'] = target
-            self.notify_registered_hooks('on_batch_start', state)
+        with torch.set_grad_enabled(False):
+            for batch in iter_data:
+                input, target = batch[0], batch[1]
+                state['iters'] += 1
+                state['input'] = input
+                state['target'] = target
+                self.notify_registered_hooks('on_batch_start', state)
 
-            if use_cuda:
-                input = input.cuda(device_id, async=True)
-                target = target.cuda(device_id, async=True)
-            input = Variable(input, volatile=True)
-            target = Variable(target, volatile=True)
+                input, target = input.to(device), target.to(device)
 
-            def closure():
-                output = state['model'](input)
-                loss = criterion(output, target)
-                iter_data.set_postfix(loss=loss.data[0])
-                state['output'] = output
-                state['test_loss'] = loss
-                self.notify_registered_hooks('on_forward_end', state)
-                # Free memory
-                state['output'] = None
-                state['test_loss'] = None
-                return loss
+                def closure():
+                    output = state['model'](input)
+                    loss = criterion(output, target)
+                    loss_val = loss.item()
+                    iter_data.set_postfix(loss=loss_val)
+                    state['output'] = output
+                    state['test_loss'] = loss_val
+                    self.notify_registered_hooks('on_forward_end', state)
+                    return loss
 
-            closure()
-            self.notify_registered_hooks('on_batch_end', state)
-        self.notify_registered_hooks('on_test_end', state)
+                closure()
+                self.notify_registered_hooks('on_batch_end', state)
+            self.notify_registered_hooks('on_test_end', state)
         return state

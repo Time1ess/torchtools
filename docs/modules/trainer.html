@@ -157,7 +157,6 @@
 <span></span><span class="c1"># coding: UTF-8</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 
-<span class="kn">from</span> <span class="nn">torch.autograd</span> <span class="k">import</span> <span class="n">Variable</span>
 <span class="kn">from</span> <span class="nn">tqdm</span> <span class="k">import</span> <span class="n">tqdm</span><span class="p">,</span> <span class="n">trange</span>
 
 <span class="kn">from</span> <span class="nn">torchtools</span> <span class="k">import</span> <span class="n">TRAIN_MODE</span><span class="p">,</span> <span class="n">VALIDATE_MODE</span><span class="p">,</span> <span class="n">TEST_MODE</span>
@@ -181,7 +180,7 @@
 
 <div class="viewcode-block" id="Trainer.__init__"><a class="viewcode-back" href="../trainer.html#trainer.Trainer.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">train_data_loader</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span>
                  <span class="n">val_data_loader</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">test_data_loader</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">use_cuda</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">device_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+                 <span class="n">device</span><span class="o">=</span><span class="s1">&#39;cpu&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Instantiate a trainer object.</span>
 
@@ -199,10 +198,9 @@
 <span class="sd">            An instance of DataLoader to load validate data.</span>
 <span class="sd">        test_data_loader(optional): torch.utils.data.DataLoader</span>
 <span class="sd">            An instance of DataLoader to load test data.</span>
-<span class="sd">        use_cuda: bool</span>
-<span class="sd">            Whether to use GPU, default `True`.</span>
-<span class="sd">        device_id: int</span>
-<span class="sd">            Which GPU should be used if use_cuda is True, default `None`.</span>
+<span class="sd">        device: str</span>
+<span class="sd">            Which device should be used if use_cuda is True, should be</span>
+<span class="sd">            formatted like &#39;cuda:0&#39; or &#39;cpu&#39;. Default: &#39;cpu&#39;.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">train_data_loader</span> <span class="o">=</span> <span class="n">train_data_loader</span>
@@ -210,8 +208,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">optimizer</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">val_data_loader</span> <span class="o">=</span> <span class="n">val_data_loader</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">test_data_loader</span> <span class="o">=</span> <span class="n">test_data_loader</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">device_id</span> <span class="o">=</span> <span class="n">device_id</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">use_cuda</span> <span class="o">=</span> <span class="n">use_cuda</span> <span class="ow">and</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">callback_hooks</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hook_entries</span><span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">meter_hooks</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hook_entries</span><span class="p">}</span>
@@ -362,8 +359,7 @@
         <span class="n">criterion</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span>
         <span class="n">optimizer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span>
         <span class="n">meters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">meters</span>
-        <span class="n">use_cuda</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cuda</span>
-        <span class="n">device_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">device_id</span>
+        <span class="n">device</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">trainer_ended</span> <span class="o">=</span> <span class="kc">False</span>
 
         <span class="n">state</span> <span class="o">=</span> <span class="p">{</span>
@@ -381,51 +377,46 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">notify_registered_hooks</span><span class="p">(</span><span class="s1">&#39;on_train_start&#39;</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
         <span class="n">iter_epoch</span> <span class="o">=</span> <span class="n">trange</span><span class="p">(</span><span class="n">max_epoch</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="n">state</span><span class="p">[</span><span class="s1">&#39;epochs&#39;</span><span class="p">],</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;epoch&#39;</span><span class="p">)</span>
         <span class="n">iter_epoch</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="s1">&#39;Train&#39;</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="n">iter_epoch</span><span class="p">:</span>
-            <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
-            <span class="n">state</span><span class="p">[</span><span class="s1">&#39;epochs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">epoch</span> <span class="o">+</span> <span class="mi">1</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">notify_registered_hooks</span><span class="p">(</span><span class="s1">&#39;on_epoch_start&#39;</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">set_grad_enabled</span><span class="p">(</span><span class="kc">True</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="n">iter_epoch</span><span class="p">:</span>
+                <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">state</span><span class="p">[</span><span class="s1">&#39;epochs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">epoch</span> <span class="o">+</span> <span class="mi">1</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">notify_registered_hooks</span><span class="p">(</span><span class="s1">&#39;on_epoch_start&#39;</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
 
-            <span class="n">iter_data</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">data_loader</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39; batches&#39;</span><span class="p">)</span>
-            <span class="n">iter_data</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="s1">&#39;Epoch &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">epoch</span><span class="p">))</span>
-            <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">iter_data</span><span class="p">:</span>
-                <span class="nb">input</span><span class="p">,</span> <span class="n">target</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">batch</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-                <span class="n">state</span><span class="p">[</span><span class="s1">&#39;iters&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
-                <span class="n">state</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">input</span>
-                <span class="n">state</span><span class="p">[</span><span class="s1">&#39;target&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">target</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">notify_registered_hooks</span><span class="p">(</span><span class="s1">&#39;on_batch_start&#39;</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+                <span class="n">iter_data</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">data_loader</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39; batches&#39;</span><span class="p">)</span>
+                <span class="n">iter_data</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="s1">&#39;Epoch &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">epoch</span><span class="p">))</span>
+                <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">iter_data</span><span class="p">:</span>
+                    <span class="nb">input</span><span class="p">,</span> <span class="n">target</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">batch</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">state</span><span class="p">[</span><span class="s1">&#39;iters&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="n">state</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">input</span>
+                    <span class="n">state</span><span class="p">[</span><span class="s1">&#39;target&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">target</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">notify_registered_hooks</span><span class="p">(</span><span class="s1">&#39;on_batch_start&#39;</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
 
-                <span class="k">if</span> <span class="n">use_cuda</span><span class="p">:</span>
-                    <span class="nb">input</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">cuda</span><span class="p">(</span><span class="n">device_id</span><span class="p">,</span> <span class="k">async</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-                    <span class="n">target</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">cuda</span><span class="p">(</span><span class="n">device_id</span><span class="p">,</span> <span class="k">async</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-                <span class="nb">input</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
-                <span class="n">target</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+                    <span class="nb">input</span><span class="p">,</span> <span class="n">target</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">),</span> <span class="n">target</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
 
-                <span class="k">def</span> <span class="nf">closure</span><span class="p">():</span>
-                    <span class="n">state</span><span class="p">[</span><span class="s1">&#39;optimizer&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
-                    <span class="n">output</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;model&#39;</span><span class="p">](</span><span class="nb">input</span><span class="p">)</span>
-                    <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
-                    <span class="n">iter_data</span><span class="o">.</span><span class="n">set_postfix</span><span class="p">(</span><span class="n">iters</span><span class="o">=</span><span class="n">state</span><span class="p">[</span><span class="s1">&#39;iters&#39;</span><span class="p">],</span>
-                                          <span class="n">loss</span><span class="o">=</span><span class="n">loss</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-                    <span class="n">state</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">output</span>
-                    <span class="n">state</span><span class="p">[</span><span class="s1">&#39;loss&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">loss</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">notify_registered_hooks</span><span class="p">(</span><span class="s1">&#39;on_forward_end&#39;</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
-                    <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">notify_registered_hooks</span><span class="p">(</span><span class="s1">&#39;on_backward_end&#39;</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
-                    <span class="c1"># Free memory</span>
-                    <span class="n">state</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-                    <span class="n">state</span><span class="p">[</span><span class="s1">&#39;loss&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-                    <span class="k">return</span> <span class="n">loss</span>
+                    <span class="k">def</span> <span class="nf">closure</span><span class="p">():</span>
+                        <span class="n">state</span><span class="p">[</span><span class="s1">&#39;optimizer&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+                        <span class="n">output</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;model&#39;</span><span class="p">](</span><span class="nb">input</span><span class="p">)</span>
+                        <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+                        <span class="n">loss_val</span> <span class="o">=</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+                        <span class="n">iter_data</span><span class="o">.</span><span class="n">set_postfix</span><span class="p">(</span><span class="n">iters</span><span class="o">=</span><span class="n">state</span><span class="p">[</span><span class="s1">&#39;iters&#39;</span><span class="p">],</span>
+                                              <span class="n">loss</span><span class="o">=</span><span class="n">loss_val</span><span class="p">)</span>
+                        <span class="n">state</span><span class="p">[</span><span class="s1">&#39;loss&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">loss_val</span>
+                        <span class="n">state</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">output</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">notify_registered_hooks</span><span class="p">(</span><span class="s1">&#39;on_forward_end&#39;</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+                        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">notify_registered_hooks</span><span class="p">(</span><span class="s1">&#39;on_backward_end&#39;</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+                        <span class="k">return</span> <span class="n">loss</span>
 
-                <span class="n">state</span><span class="p">[</span><span class="s1">&#39;optimizer&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">closure</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">notify_registered_hooks</span><span class="p">(</span><span class="s1">&#39;on_batch_end&#39;</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+                    <span class="n">state</span><span class="p">[</span><span class="s1">&#39;optimizer&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">closure</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">notify_registered_hooks</span><span class="p">(</span><span class="s1">&#39;on_batch_end&#39;</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">trainer_ended</span><span class="p">:</span>
+                        <span class="k">break</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">notify_registered_hooks</span><span class="p">(</span><span class="s1">&#39;on_epoch_end&#39;</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">trainer_ended</span><span class="p">:</span>
                     <span class="k">break</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">notify_registered_hooks</span><span class="p">(</span><span class="s1">&#39;on_epoch_end&#39;</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">trainer_ended</span><span class="p">:</span>
-                <span class="k">break</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">trainer_ended</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">notify_registered_hooks</span><span class="p">(</span><span class="s1">&#39;on_train_end&#39;</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">trainer_ended</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">notify_registered_hooks</span><span class="p">(</span><span class="s1">&#39;on_train_end&#39;</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">state</span></div>
 
 <div class="viewcode-block" id="Trainer.validate"><a class="viewcode-back" href="../trainer.html#trainer.Trainer.validate">[docs]</a>    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
@@ -443,8 +434,7 @@
         <span class="n">data_loader</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_data_loader</span>
         <span class="n">criterion</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span>
         <span class="n">meters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">meters</span>
-        <span class="n">use_cuda</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cuda</span>
-        <span class="n">device_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">device_id</span>
+        <span class="n">device</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span>
 
         <span class="n">state</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="n">model</span><span class="p">,</span>
@@ -457,34 +447,29 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">notify_registered_hooks</span><span class="p">(</span><span class="s1">&#39;on_validate_start&#39;</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
         <span class="n">iter_data</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">data_loader</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39; batches&#39;</span><span class="p">)</span>
         <span class="n">iter_data</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="s1">&#39;Validate&#39;</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">iter_data</span><span class="p">:</span>
-            <span class="nb">input</span><span class="p">,</span> <span class="n">target</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">batch</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-            <span class="n">state</span><span class="p">[</span><span class="s1">&#39;iters&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
-            <span class="n">state</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">input</span>
-            <span class="n">state</span><span class="p">[</span><span class="s1">&#39;target&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">target</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">notify_registered_hooks</span><span class="p">(</span><span class="s1">&#39;on_batch_start&#39;</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">set_grad_enabled</span><span class="p">(</span><span class="kc">False</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">iter_data</span><span class="p">:</span>
+                <span class="nb">input</span><span class="p">,</span> <span class="n">target</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">batch</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">state</span><span class="p">[</span><span class="s1">&#39;iters&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">state</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">input</span>
+                <span class="n">state</span><span class="p">[</span><span class="s1">&#39;target&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">target</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">notify_registered_hooks</span><span class="p">(</span><span class="s1">&#39;on_batch_start&#39;</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="n">use_cuda</span><span class="p">:</span>
-                <span class="nb">input</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">cuda</span><span class="p">(</span><span class="n">device_id</span><span class="p">,</span> <span class="k">async</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-                <span class="n">target</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">cuda</span><span class="p">(</span><span class="n">device_id</span><span class="p">,</span> <span class="k">async</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="nb">input</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">volatile</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="n">target</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">volatile</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="nb">input</span><span class="p">,</span> <span class="n">target</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">),</span> <span class="n">target</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
 
-            <span class="k">def</span> <span class="nf">closure</span><span class="p">():</span>
-                <span class="n">output</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;model&#39;</span><span class="p">](</span><span class="nb">input</span><span class="p">)</span>
-                <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
-                <span class="n">iter_data</span><span class="o">.</span><span class="n">set_postfix</span><span class="p">(</span><span class="n">loss</span><span class="o">=</span><span class="n">loss</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-                <span class="n">state</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">output</span>
-                <span class="n">state</span><span class="p">[</span><span class="s1">&#39;val_loss&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">loss</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">notify_registered_hooks</span><span class="p">(</span><span class="s1">&#39;on_forward_end&#39;</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
-                <span class="c1"># Free memory</span>
-                <span class="n">state</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-                <span class="n">state</span><span class="p">[</span><span class="s1">&#39;val_loss&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-                <span class="k">return</span> <span class="n">loss</span>
+                <span class="k">def</span> <span class="nf">closure</span><span class="p">():</span>
+                    <span class="n">output</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;model&#39;</span><span class="p">](</span><span class="nb">input</span><span class="p">)</span>
+                    <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+                    <span class="n">loss_val</span> <span class="o">=</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+                    <span class="n">iter_data</span><span class="o">.</span><span class="n">set_postfix</span><span class="p">(</span><span class="n">loss</span><span class="o">=</span><span class="n">loss_val</span><span class="p">)</span>
+                    <span class="n">state</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">output</span>
+                    <span class="n">state</span><span class="p">[</span><span class="s1">&#39;val_loss&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">loss_val</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">notify_registered_hooks</span><span class="p">(</span><span class="s1">&#39;on_forward_end&#39;</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="n">loss</span>
 
-            <span class="n">closure</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">notify_registered_hooks</span><span class="p">(</span><span class="s1">&#39;on_batch_end&#39;</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">notify_registered_hooks</span><span class="p">(</span><span class="s1">&#39;on_validate_end&#39;</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+                <span class="n">closure</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">notify_registered_hooks</span><span class="p">(</span><span class="s1">&#39;on_batch_end&#39;</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">notify_registered_hooks</span><span class="p">(</span><span class="s1">&#39;on_validate_end&#39;</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">state</span></div>
 
 <div class="viewcode-block" id="Trainer.test"><a class="viewcode-back" href="../trainer.html#trainer.Trainer.test">[docs]</a>    <span class="k">def</span> <span class="nf">test</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">test_data_loader</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -498,15 +483,14 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">test_data_loader</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_data_loader</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">{}</span>
-        <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">test_data_loader</span><span class="p">:</span>
             <span class="n">data_loader</span> <span class="o">=</span> <span class="n">test_data_loader</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">data_loader</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_data_loader</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
         <span class="n">criterion</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span>
         <span class="n">meters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">meters</span>
-        <span class="n">use_cuda</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cuda</span>
-        <span class="n">device_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">device_id</span>
+        <span class="n">device</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span>
 
         <span class="n">state</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="n">model</span><span class="p">,</span>
@@ -518,34 +502,29 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">notify_registered_hooks</span><span class="p">(</span><span class="s1">&#39;on_test_start&#39;</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
         <span class="n">iter_data</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">data_loader</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39; batches&#39;</span><span class="p">)</span>
         <span class="n">iter_data</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="s1">&#39;Test&#39;</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">iter_data</span><span class="p">:</span>
-            <span class="nb">input</span><span class="p">,</span> <span class="n">target</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">batch</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-            <span class="n">state</span><span class="p">[</span><span class="s1">&#39;iters&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
-            <span class="n">state</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">input</span>
-            <span class="n">state</span><span class="p">[</span><span class="s1">&#39;target&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">target</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">notify_registered_hooks</span><span class="p">(</span><span class="s1">&#39;on_batch_start&#39;</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">set_grad_enabled</span><span class="p">(</span><span class="kc">False</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">iter_data</span><span class="p">:</span>
+                <span class="nb">input</span><span class="p">,</span> <span class="n">target</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">batch</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">state</span><span class="p">[</span><span class="s1">&#39;iters&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">state</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">input</span>
+                <span class="n">state</span><span class="p">[</span><span class="s1">&#39;target&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">target</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">notify_registered_hooks</span><span class="p">(</span><span class="s1">&#39;on_batch_start&#39;</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="n">use_cuda</span><span class="p">:</span>
-                <span class="nb">input</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">cuda</span><span class="p">(</span><span class="n">device_id</span><span class="p">,</span> <span class="k">async</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-                <span class="n">target</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">cuda</span><span class="p">(</span><span class="n">device_id</span><span class="p">,</span> <span class="k">async</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="nb">input</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">volatile</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="n">target</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">volatile</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="nb">input</span><span class="p">,</span> <span class="n">target</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">),</span> <span class="n">target</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
 
-            <span class="k">def</span> <span class="nf">closure</span><span class="p">():</span>
-                <span class="n">output</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;model&#39;</span><span class="p">](</span><span class="nb">input</span><span class="p">)</span>
-                <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
-                <span class="n">iter_data</span><span class="o">.</span><span class="n">set_postfix</span><span class="p">(</span><span class="n">loss</span><span class="o">=</span><span class="n">loss</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-                <span class="n">state</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">output</span>
-                <span class="n">state</span><span class="p">[</span><span class="s1">&#39;test_loss&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">loss</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">notify_registered_hooks</span><span class="p">(</span><span class="s1">&#39;on_forward_end&#39;</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
-                <span class="c1"># Free memory</span>
-                <span class="n">state</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-                <span class="n">state</span><span class="p">[</span><span class="s1">&#39;test_loss&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-                <span class="k">return</span> <span class="n">loss</span>
+                <span class="k">def</span> <span class="nf">closure</span><span class="p">():</span>
+                    <span class="n">output</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;model&#39;</span><span class="p">](</span><span class="nb">input</span><span class="p">)</span>
+                    <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+                    <span class="n">loss_val</span> <span class="o">=</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+                    <span class="n">iter_data</span><span class="o">.</span><span class="n">set_postfix</span><span class="p">(</span><span class="n">loss</span><span class="o">=</span><span class="n">loss_val</span><span class="p">)</span>
+                    <span class="n">state</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">output</span>
+                    <span class="n">state</span><span class="p">[</span><span class="s1">&#39;test_loss&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">loss_val</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">notify_registered_hooks</span><span class="p">(</span><span class="s1">&#39;on_forward_end&#39;</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="n">loss</span>
 
-            <span class="n">closure</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">notify_registered_hooks</span><span class="p">(</span><span class="s1">&#39;on_batch_end&#39;</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">notify_registered_hooks</span><span class="p">(</span><span class="s1">&#39;on_test_end&#39;</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+                <span class="n">closure</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">notify_registered_hooks</span><span class="p">(</span><span class="s1">&#39;on_batch_end&#39;</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">notify_registered_hooks</span><span class="p">(</span><span class="s1">&#39;on_test_end&#39;</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">state</span></div></div>
 </pre></div>
 

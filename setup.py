@@ -2,7 +2,7 @@
 import sys
 from setuptools import setup, find_packages
 
-VERSION = '0.1.3'
+VERSION = '0.1.4'
 DESC = ('A High-Level training API on top of PyTorch with '
         'many useful features')
 DESC_SHORT = 'A High-Level training API on top of PyTorch'

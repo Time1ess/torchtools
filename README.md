@@ -21,7 +21,7 @@ This API provides these follows:
 
 * tqdm
 * Numpy
-* [PyTorch](http://pytorch.org)
+* [PyTorch v0.4.0+](http://pytorch.org)
 * [tensorboardX](https://github.com/lanpa/tensorboard-pytorch)
 * [Standalone TensorBoard](https://github.com/dmlc/tensorboard)(Optional)
 
