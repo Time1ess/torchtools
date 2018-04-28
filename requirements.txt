@@ -1,5 +1,5 @@
 numpy
 Pillow
 tqdm
-torch
+torchvision
 tensorboardX
