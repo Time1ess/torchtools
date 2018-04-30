@@ -42,7 +42,7 @@ class Trainer(object):
             An instance of DataLoader to load validate data.
         test_data_loader(optional): torch.utils.data.DataLoader
             An instance of DataLoader to load test data.
-        device: str
+        device: str or torch.device
             Which device should be used if use_cuda is True, should be
             formatted like 'cuda:0' or 'cpu'. Default: 'cpu'.
         """
@@ -52,7 +52,10 @@ class Trainer(object):
         self.optimizer = optimizer
         self.val_data_loader = val_data_loader
         self.test_data_loader = test_data_loader
-        self.device = torch.device(device)
+        if isinstance(device, torch.device):
+            self.device = device
+        else:
+            self.device = torch.device(device)
 
         self.callback_hooks = {k: [] for k in self.hook_entries}
         self.meter_hooks = {k: [] for k in self.hook_entries}
